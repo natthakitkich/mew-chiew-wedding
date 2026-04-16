@@ -208,31 +208,6 @@ textarea {
   font-weight: 300;
 }
 
-.swipe-hint {
-  position: absolute;
-  left: 50%;
-  bottom: calc(24px + var(--safe-bottom));
-  transform: translateX(-50%);
-  z-index: 3;
-  color: rgba(20,20,20,0.84);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 300;
-}
-
-.swipe-icon {
-  font-size: 30px !important;
-  animation: bounceUp 1.3s infinite;
-}
-
-@keyframes bounceUp {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
 /* hero intro sequence */
 
 .reveal-seq {
@@ -255,6 +230,35 @@ textarea {
 .seq-2 { transition-delay: .20s; }
 .seq-3 { transition-delay: .36s; }
 .seq-4 { transition-delay: .55s; }
+
+/* swipe hint */
+
+.swipe-hint {
+  position: absolute;
+  left: 50%;
+  bottom: calc(24px + var(--safe-bottom));
+  transform: translateX(-50%);
+  z-index: 8;
+  color: rgba(255,255,255,0.96);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 300;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.38);
+  pointer-events: none;
+}
+
+.swipe-icon {
+  font-size: 30px !important;
+  animation: bounceUp 1.3s infinite;
+}
+
+@keyframes bounceUp {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
 
 /* decor */
 
@@ -488,30 +492,35 @@ textarea {
 
 .count-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 170px));
+  justify-content: center;
   gap: 10px;
-  margin: 14px 0 16px;
+  margin: 14px auto 16px;
+  width: fit-content;
+  max-width: 100%;
 }
 
 .count-box {
   background: rgba(255,255,255,0.76);
   border-radius: 12px;
   box-shadow: 0 0 2px rgba(0,0,0,0.28);
-  padding: 12px 8px 14px;
+  padding: 10px 8px 12px;
   text-align: center;
+  width: 170px;
+  max-width: 100%;
 }
 
 .count-box span {
   display: block;
   font-family: 'Montserrat', sans-serif;
-  font-size: clamp(22px, 7vw, 32px);
+  font-size: clamp(20px, 6vw, 28px);
   line-height: 1;
 }
 
 .count-box small {
   display: block;
   margin-top: 4px;
-  font-size: clamp(12px, 3.2vw, 14px);
+  font-size: clamp(11px, 2.8vw, 13px);
   font-weight: 300;
 }
 
@@ -733,7 +742,7 @@ textarea {
 .invite-overlay {
   position: fixed;
   inset: 0;
-  z-index: 2000;
+  z-index: 3000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -746,6 +755,7 @@ textarea {
     url('images/bg-faza.jpg') center/cover no-repeat;
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
+  pointer-events: auto;
 }
 
 .invite-overlay.hidden {
@@ -758,6 +768,8 @@ textarea {
   width: min(100%, 340px);
   text-align: center;
   color: #fff;
+  position: relative;
+  z-index: 2;
 }
 
 .invite-logo-wrap {
@@ -817,10 +829,17 @@ textarea {
   font-weight: 400;
   box-shadow: 0 10px 30px rgba(0,0,0,.12);
   transition: transform .25s ease, box-shadow .25s ease;
+  position: relative;
+  z-index: 3;
+  pointer-events: auto;
 }
 
 .open-btn:active {
   transform: scale(.98);
+}
+
+.open-btn span {
+  pointer-events: none;
 }
 
 /* music */
@@ -901,7 +920,12 @@ textarea {
   }
 
   .count-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 150px));
+    gap: 12px;
+  }
+
+  .count-box {
+    width: 150px;
   }
 
   .gift-card {
@@ -962,51 +986,163 @@ textarea {
     width: 50px;
     height: 50px;
   }
-}
-/* FIX: swipe hint for mobile + facebook browser */
 
-.swipe-hint {
-  position: absolute;
-  left: 50%;
-  bottom: calc(108px + var(--safe-bottom));
-  transform: translateX(-50%);
-  z-index: 8;
-  color: rgba(255,255,255,0.96);
+  .count-grid {
+    grid-template-columns: repeat(2, minmax(0, 144px));
+    gap: 8px;
+  }
+
+  .count-box {
+    width: 144px;
+    padding: 9px 6px 11px;
+  }
+
+  .count-box span {
+    font-size: clamp(18px, 5.8vw, 24px);
+  }
+
+  .count-box small {
+    font-size: 12px;
+  }
+}
+
+/* ---------------- WEDDING GIFT SECTION ---------------- */
+
+.wedding-gift-section {
+  background-color: var(--bg-dark);
+  background-image: url('images/bg-dark.jpg');
+}
+
+.wedding-gift-content {
+  min-height: calc(100svh - 88px - var(--safe-top) - var(--safe-bottom));
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
+  justify-content: center;
+}
+
+.wedding-gift-title {
+  margin: 0 0 18px;
+  color: var(--gold);
+  font-family: 'Kanit', 'Noto Sans Thai', sans-serif;
+  font-size: clamp(34px, 8vw, 56px);
+  line-height: 1.1;
+  font-weight: 500;
+  text-align: center;
+}
+
+.wedding-gift-copy {
+  margin: 0 auto 26px;
+  max-width: 700px;
+  color: #fff;
+  font-size: clamp(16px, 4vw, 22px);
+  line-height: 1.75;
   font-weight: 300;
-  text-shadow: 0 2px 12px rgba(0,0,0,0.38);
-  pointer-events: none;
+  text-align: center;
 }
 
-.swipe-icon {
-  font-size: 30px !important;
-  animation: bounceUp 1.3s infinite;
-}
-.invite-overlay {
-  z-index: 3000;
-  pointer-events: auto;
-}
-
-.invite-card {
-  position: relative;
-  z-index: 2;
+.wedding-gift-card {
+  width: min(100%, 760px);
+  margin: 0 auto;
+  padding: 22px 22px 26px;
+  border-radius: 18px;
+  background: rgba(235, 239, 243, 0.92);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.14);
+  text-align: left;
 }
 
-.open-btn {
-  position: relative;
-  z-index: 3;
-  pointer-events: auto;
+.wedding-gift-bank-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.wedding-gift-bank-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.wedding-gift-name {
+  margin: 0 0 8px;
+  color: #363636;
+  font-size: clamp(24px, 5.2vw, 40px);
+  line-height: 1.15;
+  font-weight: 500;
+}
+
+.wedding-gift-number {
+  margin: 0;
+  color: #363636;
+  font-size: clamp(28px, 6vw, 44px);
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.wedding-gift-bank-logo {
+  flex: 0 0 auto;
+}
+
+.wedding-gift-bank-logo img {
+  width: min(210px, 34vw);
+  height: auto;
+  display: block;
+}
+
+.wedding-gift-copy-btn {
+  margin: 26px 0 0 auto;
+  min-width: 260px;
+  min-height: 58px;
+  padding: 0 26px;
+  border: none;
+  border-radius: 999px;
+  background: #fff;
+  color: #2f2f2f;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: clamp(16px, 3.6vw, 22px);
+  font-weight: 400;
   cursor: pointer;
+  transition: transform .2s ease, box-shadow .2s ease;
 }
 
-.open-btn span {
-  pointer-events: none;
+.wedding-gift-copy-btn:active {
+  transform: scale(.98);
 }
-@keyframes bounceUp {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+
+.wedding-gift-copy-btn .material-icons {
+  font-size: 24px !important;
+}
+
+@media (max-width: 767px) {
+  .wedding-gift-copy {
+    max-width: 100%;
+    margin-bottom: 22px;
+  }
+
+  .wedding-gift-card {
+    padding: 18px 16px 20px;
+    border-radius: 16px;
+  }
+
+  .wedding-gift-bank-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .wedding-gift-bank-logo img {
+    width: min(180px, 46vw);
+  }
+
+  .wedding-gift-copy-btn {
+    width: 100%;
+    min-width: 0;
+    min-height: 52px;
+    margin-top: 20px;
+    font-size: 17px;
+  }
 }
