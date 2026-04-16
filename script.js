@@ -16,11 +16,13 @@ const submitBtn = document.getElementById('submitBtn');
 const rsvpForm = document.getElementById('rsvpForm');
 const thankYouMessage = document.getElementById('thankYouMessage');
 
-const copyAccountBtn = document.getElementById('copyAccountBtn');
-const copyToast = document.getElementById('copyToast');
-
 const galleryMain = document.getElementById('galleryMain');
 const thumbs = [...document.querySelectorAll('.thumb')];
+
+const heroBlurLayer = document.getElementById('heroBlurLayer');
+const heroSequenceItems = [...document.querySelectorAll('.hero-sequence .reveal-seq')];
+const swipeHint = document.getElementById('swipeHint');
+const decorItems = [...document.querySelectorAll('.decor')];
 
 let currentSectionIndex = 0;
 let musicPlaying = false;
@@ -39,7 +41,7 @@ function playReveal(section) {
   revealItems.forEach((el, idx) => {
     setTimeout(() => {
       el.classList.add('show');
-    }, 80 + idx * 45);
+    }, 80 + idx * 60);
   });
 }
 
@@ -81,7 +83,7 @@ function showSection(index) {
 
   setTimeout(() => {
     isTransitioning = false;
-  }, 650);
+  }, 700);
 }
 
 function nextSection() {
@@ -102,6 +104,32 @@ function initHash() {
   showSection(foundIndex >= 0 ? foundIndex : 0);
 }
 
+function playHeroIntro() {
+  if (heroBlurLayer) {
+    setTimeout(() => {
+      heroBlurLayer.classList.add('hide');
+    }, 50);
+  }
+
+  decorItems.forEach((el, idx) => {
+    setTimeout(() => {
+      el.classList.add('show');
+    }, 220 + idx * 120);
+  });
+
+  heroSequenceItems.forEach((el) => {
+    setTimeout(() => {
+      el.classList.add('show');
+    }, 500);
+  });
+
+  if (swipeHint) {
+    setTimeout(() => {
+      swipeHint.classList.add('show');
+    }, 900);
+  }
+}
+
 openInvitationBtn?.addEventListener('click', async () => {
   inviteOverlay.classList.add('hidden');
   mainContent.classList.remove('locked');
@@ -110,13 +138,14 @@ openInvitationBtn?.addEventListener('click', async () => {
     await bgm.play();
     musicPlaying = true;
     musicIcon.textContent = 'pause';
+    musicBtn.classList.add('playing');
   } catch (_) {}
 
   setTimeout(() => {
     inviteOverlay.style.display = 'none';
+    initHash();
+    playHeroIntro();
   }, 850);
-
-  initHash();
 });
 
 musicBtn?.addEventListener('click', async () => {
@@ -125,10 +154,12 @@ musicBtn?.addEventListener('click', async () => {
       bgm.pause();
       musicPlaying = false;
       musicIcon.textContent = 'music_note';
+      musicBtn.classList.remove('playing');
     } else {
       await bgm.play();
       musicPlaying = true;
       musicIcon.textContent = 'pause';
+      musicBtn.classList.add('playing');
     }
   } catch (_) {}
 });
@@ -260,15 +291,10 @@ rsvpForm?.addEventListener('submit', (e) => {
   e.preventDefault();
   if (thankYouMessage) {
     thankYouMessage.style.display = 'block';
+    setTimeout(() => {
+      thankYouMessage.style.display = 'none';
+    }, 2500);
   }
-});
-
-copyAccountBtn?.addEventListener('click', () => {
-  if (!copyToast) return;
-  copyToast.style.display = 'block';
-  setTimeout(() => {
-    copyToast.style.display = 'none';
-  }, 1800);
 });
 
 thumbs.forEach((thumb) => {
@@ -280,4 +306,10 @@ thumbs.forEach((thumb) => {
     thumb.classList.add('active');
     galleryMain.src = newSrc;
   });
+});
+
+window.addEventListener('load', () => {
+  if (inviteOverlay) {
+    inviteOverlay.classList.add('show');
+  }
 });
