@@ -25,9 +25,7 @@ const heroBlurLayer = document.getElementById('heroBlurLayer');
 const decorEls = [...document.querySelectorAll('.decor')];
 const wishesList = document.getElementById('wishesList');
 
-const APPS_SCRIPT_URL =
-  'https://script.google.com/macros/s/AKfycbzclfdZRNKPk6GCKgGnOUbjWnIH3PHXi0UDSwoNhjlABroBLgoPlrlt5R4Q7fXtKn9d/exec';
-
+const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwRuagY479TBFymekFQ_VtaaNSt4hM0hbfxD_KXx_I5UWJQyFpsbsycSc_FKd6Xqv90/exec';
 let musicPlaying = false;
 let ticking = false;
 let revealObserver = null;
