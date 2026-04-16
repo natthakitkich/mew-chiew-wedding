@@ -1,3 +1,5 @@
+const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwRuagY479TBFymekFQ_VtaaNSt4hM0hbfxD_KXx_I5UWJQyFpsbsycSc_FKd6Xqv90/exec';
+
 const sections = [...document.querySelectorAll('[data-section]')];
 const navItems = [...document.querySelectorAll('.nav-item')];
 
@@ -25,7 +27,6 @@ const heroBlurLayer = document.getElementById('heroBlurLayer');
 const decorEls = [...document.querySelectorAll('.decor')];
 const wishesList = document.getElementById('wishesList');
 
-const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwRuagY479TBFymekFQ_VtaaNSt4hM0hbfxD_KXx_I5UWJQyFpsbsycSc_FKd6Xqv90/exec';
 let musicPlaying = false;
 let ticking = false;
 let revealObserver = null;
@@ -48,6 +49,7 @@ window.addEventListener('load', () => {
   initNavObserver();
   initParallax();
   runInitialStaticReveal();
+  loadWishesFromSheet();
 });
 
 /* ---------------- OPEN INVITATION ---------------- */
@@ -66,8 +68,8 @@ function runHeroSequence() {
 }
 
 function runInitialStaticReveal() {
-  const firstVisible = document.querySelectorAll('.reveal');
-  firstVisible.forEach((el) => {
+  const revealEls = document.querySelectorAll('.reveal');
+  revealEls.forEach((el) => {
     const rect = el.getBoundingClientRect();
     if (rect.top < window.innerHeight * 0.92) {
       el.classList.add('show');
@@ -138,9 +140,8 @@ function initRevealObserver() {
   revealObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
-        const el = entry.target;
         if (entry.isIntersecting) {
-          el.classList.add('show');
+          entry.target.classList.add('show');
         }
       });
     },
@@ -193,7 +194,7 @@ function initNavObserver() {
   sections.forEach((section) => navObserver.observe(section));
 }
 
-/* ---------------- PARALLAX / SOFT MOTION ---------------- */
+/* ---------------- PARALLAX ---------------- */
 
 function applyParallax() {
   const scrollY = window.scrollY;
@@ -285,7 +286,7 @@ function updateCountdown() {
 updateCountdown();
 setInterval(updateCountdown, 1000);
 
-/* ---------------- RSVP ---------------- */
+/* ---------------- RSVP STATE ---------------- */
 
 function updateRSVPState() {
   if (!attendanceSelect || !paxSelect || !guestInput || !submitBtn) return;
@@ -313,95 +314,94 @@ guestInput?.addEventListener('input', updateRSVPState);
 attendanceSelect?.addEventListener('change', updateRSVPState);
 paxSelect?.addEventListener('change', updateRSVPState);
 
+/* ---------------- GOOGLE SHEET ---------------- */
+
 function escapeHtml(text) {
   const div = document.createElement('div');
-  div.textContent = text;
+  div.textContent = text || '';
   return div.innerHTML;
 }
 
-async function saveRSVPToGoogleSheet(payload) {
-  const response = await fetch(APPS_SCRIPT_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'text/plain;charset=utf-8'
-    },
-    body: JSON.stringify(payload)
+function renderWishes(items) {
+  if (!wishesList) return;
+
+  wishesList.innerHTML = '';
+
+  if (!items || !items.length) {
+    wishesList.innerHTML = `
+      <article class="wish-item">
+        <p class="thai-text">ยังไม่มีคำอวยพรในขณะนี้</p>
+        <h3 class="thai-title">Wedding Guest</h3>
+      </article>
+    `;
+    return;
+  }
+
+  items.forEach((item) => {
+    const article = document.createElement('article');
+    article.className = 'wish-item';
+    article.innerHTML = `
+      <p class="thai-text">${escapeHtml(item.wish)}</p>
+      <h3 class="thai-title">${escapeHtml(item.name || 'แขกผู้มีเกียรติ')}</h3>
+    `;
+    wishesList.appendChild(article);
   });
+}
 
-  const text = await response.text();
-
+async function loadWishesFromSheet() {
   try {
-    return JSON.parse(text);
-  } catch (_) {
-    return { ok: false, message: 'Invalid server response', raw: text };
+    const res = await fetch(SHEET_API_URL);
+    const data = await res.json();
+
+    if (data.success) {
+      renderWishes(data.wishes || []);
+    }
+  } catch (err) {
+    console.error('Load wishes failed:', err);
   }
 }
 
 rsvpForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const guestName = guestInput?.value.trim() || 'แขกผู้มีเกียรติ';
-  const attendance = attendanceSelect?.value || '';
-  const pax = paxSelect?.value || '';
-  const wishText = wishInput?.value.trim() || '';
-
-  if (!guestName || !attendance) return;
-
-  const originalButtonText = submitBtn?.textContent || 'ส่งข้อมูล';
-
-  if (submitBtn) {
-    submitBtn.disabled = true;
-    submitBtn.classList.remove('enabled');
-    submitBtn.textContent = 'กำลังส่งข้อมูล...';
-  }
+  const payload = {
+    name: guestInput?.value.trim() || 'แขกผู้มีเกียรติ',
+    attendance: attendanceSelect?.value || '',
+    pax: paxSelect?.value || '',
+    wish: wishInput?.value.trim() || ''
+  };
 
   try {
-    const result = await saveRSVPToGoogleSheet({
-      name: guestName,
-      attendance,
-      pax,
-      wish: wishText,
-      userAgent: navigator.userAgent
+    const res = await fetch(SHEET_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify(payload)
     });
 
-    if (!result.ok) {
-      throw new Error(result.message || 'Save failed');
-    }
+    const result = await res.json();
 
-    if (wishText && wishesList) {
-      const article = document.createElement('article');
-      article.className = 'wish-item';
-      article.innerHTML = `
-        <p class="thai-text">${escapeHtml(wishText)}</p>
-        <h3 class="thai-title">${escapeHtml(guestName)}</h3>
-      `;
-      wishesList.prepend(article);
-    }
+    if (result.success) {
+      if (thankYouMessage) {
+        thankYouMessage.style.display = 'block';
+        setTimeout(() => {
+          thankYouMessage.style.display = 'none';
+        }, 2200);
+      }
 
-    if (thankYouMessage) {
-      thankYouMessage.style.display = 'block';
-      thankYouMessage.textContent = 'ส่งข้อมูลเรียบร้อยแล้ว';
-      setTimeout(() => {
-        thankYouMessage.style.display = 'none';
-      }, 2200);
-    }
+      rsvpForm.reset();
+      paxSelect.disabled = true;
+      submitBtn.disabled = true;
+      submitBtn.classList.remove('enabled');
 
-    rsvpForm.reset();
-    paxSelect.disabled = true;
+      await loadWishesFromSheet();
+    } else {
+      alert('ส่งข้อมูลไม่สำเร็จ');
+    }
   } catch (error) {
-    if (thankYouMessage) {
-      thankYouMessage.style.display = 'block';
-      thankYouMessage.textContent = 'ส่งข้อมูลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง';
-      setTimeout(() => {
-        thankYouMessage.style.display = 'none';
-      }, 2600);
-    }
-    console.error('RSVP save error:', error);
-  } finally {
-    if (submitBtn) {
-      submitBtn.textContent = originalButtonText;
-      updateRSVPState();
-    }
+    console.error(error);
+    alert('เชื่อมต่อ Google Sheet ไม่สำเร็จ');
   }
 });
 
