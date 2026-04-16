@@ -738,3 +738,219 @@ textarea {
     grid-template-columns: repeat(5, 1fr);
   }
 }
+@media (max-width: 600px) {
+  .section {
+    padding: 20px 16px 170px;
+  }
+
+  .content,
+  .content.narrow,
+  .content.wide {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .hero-content {
+    margin-top: -95px;
+    padding: 0 18px;
+  }
+
+  .hero-kicker {
+    font-size: 13px;
+    line-height: 1.4;
+    margin-bottom: 6px;
+  }
+
+  .hero-title {
+    font-size: clamp(52px, 12vw, 78px);
+    line-height: 0.86;
+    margin: 0;
+    max-width: 92%;
+  }
+
+  .hero-date {
+    margin-top: 10px;
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  .decor-top-right {
+    width: 112px;
+  }
+
+  .decor-bottom-left {
+    width: 95px;
+  }
+
+  .decor-bottom-right {
+    width: 110px;
+  }
+
+  .section-title {
+    font-size: clamp(30px, 10vw, 48px);
+    line-height: 0.95;
+    margin-bottom: 10px;
+  }
+
+  .small-title {
+    font-size: clamp(30px, 9vw, 44px);
+    line-height: 1.02;
+  }
+
+  .quote-text,
+  .quote-ref,
+  .story-copy,
+  .form-intro,
+  .person-meta,
+  .person-parent,
+  .event-date,
+  .event-location,
+  .countdown-heading,
+  .wish-item p,
+  label,
+  input,
+  select,
+  textarea {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .quote-text {
+    max-width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .couple-frame {
+    inset: 54px 14px;
+    border-radius: 140px;
+  }
+
+  .person-name {
+    font-size: clamp(34px, 8.5vw, 52px);
+    line-height: 0.95;
+  }
+
+  .amp {
+    font-size: 30px;
+    margin: 4px 0 10px;
+  }
+
+  .event-oval.outer {
+    top: 34px;
+    bottom: 34px;
+  }
+
+  .event-oval.inner {
+    top: 44px;
+    bottom: 44px;
+    left: 12px;
+    right: 12px;
+  }
+
+  .event-card {
+    margin-bottom: 18px;
+  }
+
+  .line-img {
+    width: 150px;
+    margin: 8px auto 10px;
+  }
+
+  .countdown-wrap {
+    margin-top: 8px;
+  }
+
+  .count-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin: 14px 0 14px;
+  }
+
+  .count-box {
+    padding: 10px 6px 12px;
+  }
+
+  .count-box span {
+    font-size: 20px;
+  }
+
+  .count-box small {
+    font-size: 13px;
+    margin-top: 4px;
+  }
+
+  .pill-btn {
+    min-height: 44px;
+    padding: 0 18px;
+    font-size: 15px;
+  }
+
+  .gallery-main img {
+    aspect-ratio: 4 / 5;
+  }
+
+  .gallery-thumbs {
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .form-panel {
+    top: 46px;
+    bottom: 18px;
+    left: 12px;
+    right: 12px;
+    border-radius: 18px;
+  }
+
+  .rsvp-form {
+    gap: 8px;
+  }
+
+  input,
+  select,
+  textarea {
+    padding: 11px 12px;
+    font-size: 16px;
+  }
+
+  textarea {
+    min-height: 110px;
+  }
+
+  .wishes-panel {
+    top: 44px;
+    bottom: 44px;
+    left: 12px;
+    right: 12px;
+  }
+
+  .wishes-list {
+    height: min(420px, 56vh);
+    padding: 10px 8px;
+  }
+
+  .wish-item h3 {
+    font-size: 34px;
+  }
+
+  .music-btn {
+    top: 76px;
+    right: 14px;
+    width: 54px;
+    height: 54px;
+  }
+
+  .bottom-nav {
+    left: 12px;
+    right: 12px;
+    bottom: 88px;
+    gap: 4px;
+    padding: 8px;
+  }
+
+  .nav-item {
+    min-height: 40px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+}
