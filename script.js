@@ -12,18 +12,18 @@ const musicIcon = document.getElementById('musicIcon');
 const attendanceSelect = document.getElementById('attendanceSelect');
 const paxSelect = document.getElementById('paxSelect');
 const guestInput = document.getElementById('guestInput');
+const wishInput = document.getElementById('wishInput');
 const submitBtn = document.getElementById('submitBtn');
 const rsvpForm = document.getElementById('rsvpForm');
 const thankYouMessage = document.getElementById('thankYouMessage');
-
-const copyAccountBtn = document.getElementById('copyAccountBtn');
-const copyToast = document.getElementById('copyToast');
 
 const galleryMain = document.getElementById('galleryMain');
 const thumbs = [...document.querySelectorAll('.thumb')];
 
 const heroBg = document.querySelector('.hero-fixed-bg');
+const heroBlurLayer = document.getElementById('heroBlurLayer');
 const decorEls = [...document.querySelectorAll('.decor')];
+const wishesList = document.getElementById('wishesList');
 
 let musicPlaying = false;
 let ticking = false;
@@ -46,24 +46,32 @@ window.addEventListener('load', () => {
   initRevealObserver();
   initNavObserver();
   initParallax();
+  runInitialStaticReveal();
 });
 
 /* ---------------- OPEN INVITATION ---------------- */
 
-function runIntroReveal() {
-  const hero = document.getElementById('hero');
-  if (!hero) return;
+function runHeroSequence() {
+  const seqEls = document.querySelectorAll('.reveal-seq');
+  seqEls.forEach((el) => el.classList.remove('show'));
 
-  const revealEls = hero.querySelectorAll('.reveal');
-  revealEls.forEach((el) => el.classList.remove('show'));
-
-  setTimeout(() => {
-    revealEls.forEach((el, index) => {
+  requestAnimationFrame(() => {
+    seqEls.forEach((el, index) => {
       setTimeout(() => {
         el.classList.add('show');
-      }, 140 + index * 180);
+      }, 120 + index * 180);
     });
-  }, 120);
+  });
+}
+
+function runInitialStaticReveal() {
+  const firstVisible = document.querySelectorAll('.reveal');
+  firstVisible.forEach((el) => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.92) {
+      el.classList.add('show');
+    }
+  });
 }
 
 openInvitationBtn?.addEventListener('click', async () => {
@@ -80,8 +88,9 @@ openInvitationBtn?.addEventListener('click', async () => {
 
   setTimeout(() => {
     inviteOverlay.style.display = 'none';
-    runIntroReveal();
+    runHeroSequence();
     updateActiveNavByScroll();
+    runInitialStaticReveal();
   }, 850);
 });
 
@@ -131,13 +140,11 @@ function initRevealObserver() {
         const el = entry.target;
         if (entry.isIntersecting) {
           el.classList.add('show');
-        } else if (window.scrollY < 40 && el.closest('#hero')) {
-          el.classList.remove('show');
         }
       });
     },
     {
-      threshold: 0.16,
+      threshold: 0.14,
       rootMargin: '0px 0px -8% 0px'
     }
   );
@@ -157,7 +164,6 @@ function setActiveNav(id) {
 
 function updateActiveNavByScroll() {
   const viewportMiddle = window.scrollY + window.innerHeight * 0.42;
-
   let currentId = sections[0]?.id || 'hero';
 
   sections.forEach((section) => {
@@ -195,6 +201,12 @@ function applyParallax() {
     heroBg.style.transform = `scale(1.04) translate3d(0, ${scrollY * 0.08}px, 0)`;
   }
 
+  if (heroBlurLayer) {
+    const blur = Math.min(scrollY * 0.02, 6);
+    heroBlurLayer.style.backdropFilter = `blur(${blur}px)`;
+    heroBlurLayer.style.webkitBackdropFilter = `blur(${blur}px)`;
+  }
+
   decorEls.forEach((el, index) => {
     const speed = index === 0 ? 0.045 : index === 1 ? -0.028 : 0.035;
     const rotate = index === 0 ? 0.2 : index === 1 ? -0.12 : 0.15;
@@ -208,7 +220,10 @@ function applyParallax() {
     const rect = section.getBoundingClientRect();
     const centerOffset = rect.top + rect.height / 2 - window.innerHeight / 2;
     const move = Math.max(-18, Math.min(18, centerOffset * -0.03));
+    const opacity = Math.max(0.88, 1 - Math.abs(centerOffset) / 2400);
+
     content.style.transform = `translate3d(0, ${move}px, 0)`;
+    content.style.opacity = `${opacity}`;
   });
 
   updateActiveNavByScroll();
@@ -297,24 +312,39 @@ guestInput?.addEventListener('input', updateRSVPState);
 attendanceSelect?.addEventListener('change', updateRSVPState);
 paxSelect?.addEventListener('change', updateRSVPState);
 
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 rsvpForm?.addEventListener('submit', (e) => {
   e.preventDefault();
+
+  const guestName = guestInput.value.trim() || 'แขกผู้มีเกียรติ';
+  const wishText = wishInput?.value.trim();
+
+  if (wishText && wishesList) {
+    const article = document.createElement('article');
+    article.className = 'wish-item';
+    article.innerHTML = `
+      <p class="thai-text">${escapeHtml(wishText)}</p>
+      <h3 class="thai-title">${escapeHtml(guestName)}</h3>
+    `;
+    wishesList.prepend(article);
+  }
+
   if (thankYouMessage) {
     thankYouMessage.style.display = 'block';
     setTimeout(() => {
       thankYouMessage.style.display = 'none';
     }, 2200);
   }
-});
 
-/* ---------------- GIFT BUTTON ---------------- */
-
-copyAccountBtn?.addEventListener('click', () => {
-  if (!copyToast) return;
-  copyToast.style.display = 'block';
-  setTimeout(() => {
-    copyToast.style.display = 'none';
-  }, 1800);
+  rsvpForm.reset();
+  paxSelect.disabled = true;
+  submitBtn.disabled = true;
+  submitBtn.classList.remove('enabled');
 });
 
 /* ---------------- GALLERY ---------------- */
