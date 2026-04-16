@@ -1,0 +1,564 @@
+:root {
+  --bg-main: #f7f1ea;
+  --bg-dark: #124363;
+  --gold: #d1a449;
+  --gold-soft: #cc9933;
+  --ink: #1f1f1f;
+  --white: #ffffff;
+  --panel: rgba(255,255,255,0.72);
+  --panel-strong: rgba(255,255,255,0.86);
+  --line: rgba(255,255,255,0.15);
+  --shadow: 0 12px 30px rgba(0,0,0,0.18);
+  --radius-xl: 28px;
+  --radius-lg: 22px;
+  --radius-md: 14px;
+  --nav-height: 72px;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  color: var(--ink);
+  background: var(--bg-main);
+  overflow-x: hidden;
+}
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button, input, select, textarea { font: inherit; }
+
+.main.locked {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.section {
+  position: relative;
+  min-height: 100vh;
+  padding: 28px 18px 110px;
+  background-image: url('https://lib.simanten.com/wp-content/uploads/2024/11/bg-faza.jpg');
+  background-position: center;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hidden-section { display: none; }
+.section.active,
+.hidden-section.section-visible { display: flex; }
+
+.content { width: min(100%, 860px); position: relative; z-index: 2; }
+.content.narrow { width: min(100%, 720px); }
+.content.wide { width: min(100%, 980px); }
+.center { text-align: center; }
+
+.hero-section {
+  background: transparent;
+  overflow: hidden;
+}
+
+.hero-fixed-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('images/hero-mobile.jpg'), url('https://lib.simanten.com/wp-content/uploads/2024/11/bg-faza.jpg');
+  background-position: center;
+  background-size: cover;
+  transform: scale(1.02);
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 70%, rgba(0,0,0,0.58) 100%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  color: var(--white);
+  margin-top: -70px;
+}
+
+.hero-kicker,
+.hero-date,
+.quote-ref,
+.section-copy,
+.story-copy,
+.form-intro {
+  font-size: clamp(14px, 3.6vw, 18px);
+  line-height: 1.7;
+}
+
+.hero-title,
+.person-name,
+.section-title,
+.amp,
+.invite-guest {
+  font-family: 'Tangerine', cursive;
+}
+
+.hero-title {
+  font-size: clamp(76px, 17vw, 150px);
+  line-height: 0.9;
+  margin: 12px 0;
+  font-weight: 700;
+}
+
+.hero-date {
+  margin: 0;
+  color: var(--white);
+}
+
+.swipe-hint {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  color: #1a1a1a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.swipe-icon {
+  font-size: 34px !important;
+  animation: bounceUp 1.3s infinite;
+}
+
+@keyframes bounceUp {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.decor {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+}
+.decor-top-right { top: 0; right: 0; width: min(210px, 36vw); }
+.decor-bottom-left { bottom: 0; left: 0; width: min(130px, 24vw); }
+.decor-bottom-right { bottom: 0; right: 0; width: min(190px, 32vw); }
+
+.quote-section,
+.wishes-section,
+.event-section {
+  background-color: var(--bg-dark);
+  background-image: none;
+}
+
+.shell-dark {
+  width: 100%;
+  color: var(--white);
+}
+
+.arabic-line {
+  font-size: clamp(20px, 5vw, 34px);
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+
+.quote-text {
+  margin: 0 auto 16px;
+  font-size: clamp(15px, 3.8vw, 19px);
+  line-height: 1.85;
+  max-width: 620px;
+}
+
+.couple-frame {
+  position: absolute;
+  inset: 60px 20px;
+  border: 4px solid #186191;
+  box-shadow: 0 0 0 7px rgba(250,250,250,0.2);
+  border-radius: 220px;
+  background: url('https://lib.simanten.com/wp-content/uploads/2024/06/60_background.jpg') center/cover no-repeat;
+}
+
+.person-block {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 28px;
+}
+
+.person-image {
+  width: min(240px, 62vw);
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  margin: 0 auto 10px;
+  border-radius: 999px;
+  display: none;
+}
+
+.person-name {
+  font-size: clamp(42px, 9vw, 78px);
+  color: var(--gold-soft);
+  margin: 0 0 6px;
+  line-height: 0.92;
+}
+
+.person-meta,
+.person-parent,
+.event-date,
+.event-location,
+.countdown-heading,
+.wish-item p,
+.wish-item h3,
+label,
+input,
+select,
+textarea {
+  font-size: clamp(14px, 3.8vw, 18px);
+  line-height: 1.7;
+}
+
+.amp {
+  font-size: 38px;
+  margin: 8px 0 14px;
+}
+
+.event-oval {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  border-radius: 300px;
+  background: rgba(255,255,255,0.6);
+  box-shadow: 0 0 8px rgba(0,0,0,0.28);
+}
+.event-oval.outer { top: 50px; bottom: 50px; }
+.event-oval.inner { top: 60px; bottom: 60px; left: 20px; right: 20px; }
+
+.event-card {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 28px;
+}
+
+.section-title {
+  font-size: clamp(42px, 10vw, 82px);
+  line-height: 0.9;
+  margin: 0 0 14px;
+  color: #333;
+}
+.section-title.gold { color: var(--gold); }
+
+.line-img {
+  width: min(210px, 52vw);
+  margin: 10px auto 14px;
+}
+
+.count-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 18px 0 16px;
+}
+
+.count-box {
+  background: rgba(255,255,255,0.72);
+  border-radius: 8px;
+  box-shadow: 0 0 2px rgba(0,0,0,0.55);
+  padding: 10px 8px 14px;
+}
+.count-box span {
+  display: block;
+  font-size: clamp(24px, 6vw, 34px);
+  line-height: 1;
+}
+.count-box small {
+  display: block;
+  margin-top: 6px;
+  font-size: clamp(11px, 3vw, 14px);
+}
+
+.pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: 999px;
+  border: none;
+  background: #fff;
+  color: #111;
+  box-shadow: 0 1px 2px rgba(0,0,0,.15);
+  cursor: pointer;
+}
+.pill-btn.secondary { margin-top: 6px; }
+.pill-btn.small { min-height: 42px; font-size: 14px; }
+
+.gift-card,
+.wishes-panel,
+.form-panel {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  z-index: 1;
+}
+
+.gift-card {
+  position: relative;
+  z-index: 2;
+  margin-top: 26px;
+  background: rgba(255,255,255,0.7);
+  box-shadow: 0 1px 2px rgba(0,0,0,.1);
+  border-radius: 7px;
+  padding: 18px 15px;
+  display: grid;
+  gap: 16px;
+}
+
+.gallery-main {
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  background: #f4f4f4;
+}
+.gallery-main img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+.gallery-thumbs {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+.thumb {
+  border: 0;
+  padding: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  opacity: 0.45;
+  cursor: pointer;
+  background: none;
+}
+.thumb.active { opacity: 1; }
+.thumb img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.form-panel {
+  top: 60px;
+  bottom: 20px;
+  background: rgba(243,243,243,0.9);
+  border-radius: 20px;
+  box-shadow: 0 1px 6px rgba(108,96,85,0.4);
+}
+.form-content {
+  position: relative;
+  z-index: 2;
+}
+.rsvp-form {
+  display: grid;
+  gap: 10px;
+}
+input, select, textarea {
+  width: 100%;
+  border: 1px solid #cfd4da;
+  background: #fff;
+  border-radius: 5px;
+  padding: 12px 14px;
+  color: #333;
+}
+textarea { resize: vertical; min-height: 130px; }
+
+.submit-btn {
+  margin-top: 6px;
+  height: 50px;
+  width: 100%;
+  border: none;
+  background: lightgrey;
+  color: #333;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.submit-btn.enabled {
+  opacity: 1;
+  cursor: pointer;
+  background: var(--gold);
+  color: #fff;
+}
+
+.thank-you,
+.toast {
+  display: none;
+  margin-top: 12px;
+  padding: 10px 12px;
+  text-align: center;
+  color: #fff;
+  background: #7b7b7b;
+}
+.toast {
+  position: fixed;
+  left: 20px;
+  right: 20px;
+  bottom: 92px;
+  z-index: 1200;
+  box-shadow: 0 1px 8px rgba(50,50,50,0.7);
+}
+
+.wishes-panel {
+  top: 60px;
+  bottom: 60px;
+  background: rgba(255,255,255,0.6);
+  border-radius: 20px;
+  box-shadow: 0 1px 4px #777;
+}
+.wishes-list {
+  position: relative;
+  z-index: 2;
+  padding: 12px 10px;
+  height: min(450px, 62vh);
+  overflow: auto;
+  text-align: center;
+  color: #333;
+}
+.wish-item {
+  padding: 0 0 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #cdcdcd;
+}
+.wish-item h3 {
+  font-family: 'Tangerine', cursive;
+  font-size: clamp(28px, 6vw, 42px);
+  margin: 8px 0 0;
+}
+
+.invite-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background:
+    linear-gradient(rgba(255,255,255,0.72), rgba(255,255,255,0.72)),
+    url('https://lib.simanten.com/wp-content/uploads/2024/11/bg-faza.jpg') center/cover no-repeat;
+  backdrop-filter: blur(5px);
+}
+
+.invite-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+.invite-card {
+  text-align: center;
+  color: #fff;
+}
+
+.invite-logo-wrap { margin-bottom: 18px; }
+.invite-logo {
+  width: 112px;
+  height: 112px;
+  margin: 0 auto;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: 'Tangerine', cursive;
+  font-size: 42px;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.08);
+}
+.invite-kicker { margin: 0 0 4px; font-weight: 700; }
+.invite-guest {
+  margin: 0 0 22px;
+  font-size: clamp(38px, 9vw, 64px);
+  line-height: 0.95;
+}
+.open-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 220px;
+  height: 48px;
+  border: none;
+  background: var(--gold);
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  cursor: pointer;
+}
+
+.music-btn {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 1600;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,.52);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+
+.bottom-nav {
+  position: fixed;
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+  z-index: 1500;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  padding: 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow);
+}
+.nav-item {
+  min-height: 42px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+}
+.nav-item.active {
+  background: var(--gold);
+  color: #fff;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.reveal.show { opacity: 1; transform: none; }
+.reveal-left { transform: translateX(-30px); }
+.reveal-right { transform: translateX(30px); }
+.reveal-scale { transform: scale(.94); }
+.delay-1 { transition-delay: .14s; }
+.delay-2 { transition-delay: .28s; }
+.delay-3 { transition-delay: .42s; }
+
+@media (min-width: 768px) {
+  .section { padding-left: 28px; padding-right: 28px; }
+  .person-image { display: none; }
+  .gift-card { grid-template-columns: 1fr auto; align-items: center; }
+}
+
+@media (max-width: 600px) {
+  .count-grid { grid-template-columns: repeat(2, 1fr); }
+  .gallery-thumbs { grid-template-columns: repeat(5, 1fr); }
+  .bottom-nav { font-size: 11px; }
+}
