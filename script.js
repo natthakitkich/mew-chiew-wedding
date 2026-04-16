@@ -20,6 +20,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const rsvpForm = document.getElementById('rsvpForm');
   const thankYouMessage = document.getElementById('thankYouMessage');
 
+
+  const copyGiftAccountBtn = document.getElementById('copyGiftAccountBtn');
+const giftAccountNumber = document.getElementById('giftAccountNumber');
+const giftCopyToast = document.getElementById('giftCopyToast');
+
+  
   const galleryMain = document.getElementById('galleryMain');
   const thumbs = [...document.querySelectorAll('.thumb')];
 
@@ -423,4 +429,22 @@ document.addEventListener('DOMContentLoaded', () => {
   initParallax();
   runInitialStaticReveal();
   loadWishesFromSheet();
+});
+/* ---------------- WEDDING GIFT COPY ---------------- */
+
+copyGiftAccountBtn?.addEventListener('click', async () => {
+  const accountNumber = giftAccountNumber?.textContent?.trim();
+  if (!accountNumber) return;
+
+  try {
+    await navigator.clipboard.writeText(accountNumber);
+    if (giftCopyToast) {
+      giftCopyToast.style.display = 'block';
+      setTimeout(() => {
+        giftCopyToast.style.display = 'none';
+      }, 1800);
+    }
+  } catch (_) {
+    alert('คัดลอกเลขบัญชีไม่สำเร็จ');
+  }
 });
