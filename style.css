@@ -84,7 +84,7 @@ textarea {
   padding:
     calc(var(--safe-top) + 24px)
     16px
-    calc(142px + var(--safe-bottom));
+    calc(54px + var(--safe-bottom));
   background-image: url('images/bg-faza.jpg');
   background-position: center;
   background-size: cover;
@@ -169,7 +169,7 @@ textarea {
 }
 
 .hero-center {
-  min-height: calc(100svh - 156px - var(--safe-top) - var(--safe-bottom));
+  min-height: calc(100svh - 96px - var(--safe-top) - var(--safe-bottom));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -211,7 +211,7 @@ textarea {
 .swipe-hint {
   position: absolute;
   left: 50%;
-  bottom: calc(110px + var(--safe-bottom));
+  bottom: calc(24px + var(--safe-bottom));
   transform: translateX(-50%);
   z-index: 3;
   color: rgba(20,20,20,0.84);
@@ -315,7 +315,7 @@ textarea {
 }
 
 .quote-wrap {
-  min-height: calc(100svh - 170px - var(--safe-top) - var(--safe-bottom));
+  min-height: calc(100svh - 88px - var(--safe-top) - var(--safe-bottom));
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -360,7 +360,7 @@ textarea {
   top: calc(var(--safe-top) + 32px);
   left: 12px;
   right: 12px;
-  bottom: calc(114px + var(--safe-bottom));
+  bottom: calc(42px + var(--safe-bottom));
   border: 4px solid #186191;
   box-shadow: 0 0 0 7px rgba(250,250,250,0.2);
   border-radius: 152px;
@@ -369,7 +369,7 @@ textarea {
 }
 
 .couple-content {
-  min-height: calc(100svh - 170px - var(--safe-top) - var(--safe-bottom));
+  min-height: calc(100svh - 88px - var(--safe-top) - var(--safe-bottom));
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -426,12 +426,12 @@ textarea {
 
 .event-oval.outer {
   top: calc(var(--safe-top) + 18px);
-  bottom: calc(114px + var(--safe-bottom));
+  bottom: calc(42px + var(--safe-bottom));
 }
 
 .event-oval.inner {
   top: calc(var(--safe-top) + 28px);
-  bottom: calc(124px + var(--safe-bottom));
+  bottom: calc(52px + var(--safe-bottom));
   left: 14px;
   right: 14px;
 }
@@ -439,7 +439,7 @@ textarea {
 .event-content {
   position: relative;
   z-index: 2;
-  min-height: calc(100svh - 170px - var(--safe-top) - var(--safe-bottom));
+  min-height: calc(100svh - 88px - var(--safe-top) - var(--safe-bottom));
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -519,7 +519,7 @@ textarea {
 
 .story-section .content,
 .gift-section .content {
-  min-height: calc(100svh - 170px - var(--safe-top) - var(--safe-bottom));
+  min-height: calc(100svh - 88px - var(--safe-top) - var(--safe-bottom));
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -530,6 +530,14 @@ textarea {
   font-size: clamp(15px, 4vw, 18px);
   line-height: 1.7;
   font-weight: 300;
+}
+
+.story-section .story-copy {
+  color: #fff;
+}
+
+.gift-section .section-copy {
+  color: #fff;
 }
 
 .gift-card {
@@ -547,7 +555,7 @@ textarea {
 /* gallery */
 
 .gallery-section .content {
-  min-height: calc(100svh - 170px - var(--safe-top) - var(--safe-bottom));
+  min-height: calc(100svh - 88px - var(--safe-top) - var(--safe-bottom));
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -603,7 +611,7 @@ textarea {
   top: calc(var(--safe-top) + 24px);
   left: 12px;
   right: 12px;
-  bottom: calc(114px + var(--safe-bottom));
+  bottom: calc(42px + var(--safe-bottom));
   background: rgba(243,243,243,0.92);
   border-radius: 22px;
   box-shadow: 0 1px 6px rgba(108,96,85,0.35);
@@ -613,7 +621,7 @@ textarea {
 .form-content {
   position: relative;
   z-index: 2;
-  min-height: calc(100svh - 170px - var(--safe-top) - var(--safe-bottom));
+  min-height: calc(100svh - 88px - var(--safe-top) - var(--safe-bottom));
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -678,7 +686,7 @@ textarea {
   position: fixed;
   left: 16px;
   right: 16px;
-  bottom: calc(90px + var(--safe-bottom));
+  bottom: calc(26px + var(--safe-bottom));
   z-index: 1200;
   box-shadow: 0 1px 8px rgba(50,50,50,0.7);
 }
@@ -690,7 +698,7 @@ textarea {
   top: calc(var(--safe-top) + 24px);
   left: 12px;
   right: 12px;
-  bottom: calc(114px + var(--safe-bottom));
+  bottom: calc(42px + var(--safe-bottom));
   background: rgba(255,255,255,0.62);
   border-radius: 20px;
   box-shadow: 0 1px 4px #777;
@@ -839,40 +847,14 @@ textarea {
   transform: scale(.96);
 }
 
-/* nav */
+/* hide bottom nav completely */
 
 .bottom-nav {
-  position: fixed;
-  left: 12px;
-  right: 12px;
-  bottom: calc(10px + var(--safe-bottom));
-  z-index: 1500;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 4px;
-  padding: 8px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.88);
-  backdrop-filter: blur(14px);
-  box-shadow: var(--shadow);
+  display: none !important;
 }
 
 .nav-item {
-  min-height: 40px;
-  border-radius: 999px;
-  display: grid;
-  place-items: center;
-  text-align: center;
-  white-space: nowrap;
-  font-size: 12px;
-  font-weight: 500;
-  color: #555;
-  transition: background .25s ease, color .25s ease, transform .25s ease;
-}
-
-.nav-item.active {
-  background: var(--gold);
-  color: #fff;
+  display: none !important;
 }
 
 /* reveal */
@@ -915,6 +897,7 @@ textarea {
   .section {
     padding-left: 28px;
     padding-right: 28px;
+    padding-bottom: calc(64px + var(--safe-bottom));
   }
 
   .count-grid {
@@ -931,6 +914,7 @@ textarea {
   .section {
     padding-left: 14px;
     padding-right: 14px;
+    padding-bottom: calc(48px + var(--safe-bottom));
   }
 
   .hero-content {
@@ -972,21 +956,10 @@ textarea {
     right: 10px;
   }
 
-  .bottom-nav {
-    left: 10px;
-    right: 10px;
-    gap: 3px;
-    padding: 7px;
+  .music-btn {
+    top: calc(var(--safe-top) + 18px);
+    right: 12px;
+    width: 50px;
+    height: 50px;
   }
-
-  .nav-item {
-    font-size: 11px;
-  }
-}
-.story-section .story-copy {
-  color: #fff;
-}
-
-.gift-section .section-copy {
-  color: #fff;
 }
