@@ -24,116 +24,69 @@ const thumbs = [...document.querySelectorAll('.thumb')];
 
 const heroBg = document.querySelector('.hero-fixed-bg');
 const decorEls = [...document.querySelectorAll('.decor')];
-const allRevealEls = [...document.querySelectorAll('.reveal')];
 
 let musicPlaying = false;
-let isProgrammaticScroll = false;
-let activeSectionId = '';
-let touchStartY = 0;
-let touchStartX = 0;
-let wheelLock = false;
+let ticking = false;
+let revealObserver = null;
+let navObserver = null;
 
-// -----------------------------
-// FORCE START AT FIRST PAGE
-// -----------------------------
-function resetToFirstSection() {
-  if (!sections.length) return;
-  history.replaceState(null, '', window.location.pathname + window.location.search);
-  requestAnimationFrame(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-  });
-}
+/* ---------------- FIRST LOAD TO TOP ---------------- */
 
-// -----------------------------
-// SECTION / NAV
-// -----------------------------
-function updateNavByScroll() {
-  const middle = window.innerHeight * 0.45;
-  let current = sections[0];
-
-  for (const section of sections) {
-    const rect = section.getBoundingClientRect();
-    if (rect.top <= middle && rect.bottom >= middle) {
-      current = section;
-      break;
-    }
+function forceStartAtTop() {
+  if (location.hash) {
+    history.replaceState(null, '', location.pathname + location.search);
   }
-
-  if (!current) return;
-
-  activeSectionId = current.id;
-
-  navItems.forEach((item) => {
-    item.classList.toggle('active', item.getAttribute('href') === `#${activeSectionId}`);
-  });
+  window.scrollTo(0, 0);
 }
 
-function smoothScrollToSection(section) {
-  if (!section) return;
-  isProgrammaticScroll = true;
+forceStartAtTop();
 
-  section.scrollIntoView({
-    behavior: 'smooth',
-    block: 'start'
-  });
-
-  setTimeout(() => {
-    isProgrammaticScroll = false;
-  }, 900);
-}
-
-function goToNextSection() {
-  const currentIndex = sections.findIndex((sec) => sec.id === activeSectionId);
-  if (currentIndex >= 0 && currentIndex < sections.length - 1) {
-    smoothScrollToSection(sections[currentIndex + 1]);
-  }
-}
-
-function goToPrevSection() {
-  const currentIndex = sections.findIndex((sec) => sec.id === activeSectionId);
-  if (currentIndex > 0) {
-    smoothScrollToSection(sections[currentIndex - 1]);
-  }
-}
-
-navItems.forEach((item) => {
-  item.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (mainContent.classList.contains('locked')) return;
-    const targetId = item.getAttribute('href').replace('#', '');
-    const targetSection = document.getElementById(targetId);
-    smoothScrollToSection(targetSection);
-  });
+window.addEventListener('load', () => {
+  forceStartAtTop();
+  initRevealObserver();
+  initNavObserver();
+  initParallax();
 });
 
-// -----------------------------
-// OPEN INVITATION
-// -----------------------------
+/* ---------------- OPEN INVITATION ---------------- */
+
+function runIntroReveal() {
+  const hero = document.getElementById('hero');
+  if (!hero) return;
+
+  const revealEls = hero.querySelectorAll('.reveal');
+  revealEls.forEach((el) => el.classList.remove('show'));
+
+  setTimeout(() => {
+    revealEls.forEach((el, index) => {
+      setTimeout(() => {
+        el.classList.add('show');
+      }, 140 + index * 180);
+    });
+  }, 120);
+}
+
 openInvitationBtn?.addEventListener('click', async () => {
+  forceStartAtTop();
+
   inviteOverlay.classList.add('hidden');
   mainContent.classList.remove('locked');
-
-  resetToFirstSection();
 
   try {
     await bgm.play();
     musicPlaying = true;
     if (musicIcon) musicIcon.textContent = 'pause';
-  } catch (_) {
-    musicPlaying = false;
-    if (musicIcon) musicIcon.textContent = 'music_note';
-  }
+  } catch (_) {}
 
   setTimeout(() => {
-    if (inviteOverlay) inviteOverlay.style.display = 'none';
-    runInitialAnimations();
-    updateOnScroll();
-  }, 700);
+    inviteOverlay.style.display = 'none';
+    runIntroReveal();
+    updateActiveNavByScroll();
+  }, 850);
 });
 
-// -----------------------------
-// MUSIC
-// -----------------------------
+/* ---------------- MUSIC ---------------- */
+
 musicBtn?.addEventListener('click', async () => {
   try {
     if (musicPlaying) {
@@ -148,174 +101,139 @@ musicBtn?.addEventListener('click', async () => {
   } catch (_) {}
 });
 
-// -----------------------------
-// REVEAL / APPLE-LIKE MOVEMENT
-// -----------------------------
-function runInitialAnimations() {
-  allRevealEls.forEach((el, i) => {
-    setTimeout(() => {
-      el.classList.add('show');
-    }, 120 + i * 70);
+/* ---------------- NAV CLICK ---------------- */
+
+navItems.forEach((item) => {
+  item.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    const targetId = item.getAttribute('href')?.replace('#', '');
+    const target = document.getElementById(targetId);
+    if (!target) return;
+
+    const top = target.getBoundingClientRect().top + window.scrollY - 12;
+
+    window.scrollTo({
+      top,
+      behavior: 'smooth'
+    });
+  });
+});
+
+/* ---------------- REVEAL ON SCROLL ---------------- */
+
+function initRevealObserver() {
+  if (revealObserver) revealObserver.disconnect();
+
+  revealObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        const el = entry.target;
+        if (entry.isIntersecting) {
+          el.classList.add('show');
+        } else if (window.scrollY < 40 && el.closest('#hero')) {
+          el.classList.remove('show');
+        }
+      });
+    },
+    {
+      threshold: 0.16,
+      rootMargin: '0px 0px -8% 0px'
+    }
+  );
+
+  document.querySelectorAll('.reveal').forEach((el) => {
+    revealObserver.observe(el);
   });
 }
 
-function updateRevealByViewport() {
-  const triggerPoint = window.innerHeight * 0.88;
+/* ---------------- ACTIVE NAV ---------------- */
 
-  allRevealEls.forEach((el) => {
-    const rect = el.getBoundingClientRect();
+function setActiveNav(id) {
+  navItems.forEach((item) => {
+    item.classList.toggle('active', item.getAttribute('href') === `#${id}`);
+  });
+}
 
-    if (rect.top < triggerPoint && rect.bottom > 0) {
-      el.classList.add('show');
-    } else if (rect.top > window.innerHeight || rect.bottom < 0) {
-      el.classList.remove('show');
+function updateActiveNavByScroll() {
+  const viewportMiddle = window.scrollY + window.innerHeight * 0.42;
+
+  let currentId = sections[0]?.id || 'hero';
+
+  sections.forEach((section) => {
+    const top = section.offsetTop;
+    const height = section.offsetHeight;
+    if (viewportMiddle >= top && viewportMiddle < top + height) {
+      currentId = section.id;
     }
   });
+
+  setActiveNav(currentId);
 }
 
-function updateParallax() {
+function initNavObserver() {
+  if (navObserver) navObserver.disconnect();
+
+  navObserver = new IntersectionObserver(
+    () => {
+      updateActiveNavByScroll();
+    },
+    {
+      threshold: [0.2, 0.45, 0.7]
+    }
+  );
+
+  sections.forEach((section) => navObserver.observe(section));
+}
+
+/* ---------------- PARALLAX / SOFT MOTION ---------------- */
+
+function applyParallax() {
   const scrollY = window.scrollY;
 
   if (heroBg) {
-    const scale = 1.02 + Math.min(scrollY * 0.00008, 0.035);
-    const translate = Math.min(scrollY * 0.18, 46);
-    heroBg.style.transform = `translate3d(0, ${translate}px, 0) scale(${scale})`;
+    heroBg.style.transform = `scale(1.04) translate3d(0, ${scrollY * 0.08}px, 0)`;
   }
 
   decorEls.forEach((el, index) => {
-    const speed = (index + 1) * 0.08 + 0.05;
-    const y = scrollY * speed;
-    const x = index % 2 === 0 ? scrollY * 0.015 : -scrollY * 0.015;
-    el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    const speed = index === 0 ? 0.045 : index === 1 ? -0.028 : 0.035;
+    const rotate = index === 0 ? 0.2 : index === 1 ? -0.12 : 0.15;
+    el.style.transform = `translate3d(0, ${scrollY * speed}px, 0) rotate(${scrollY * rotate * 0.02}deg)`;
   });
-}
 
-function updateSectionDepth() {
   sections.forEach((section) => {
-    const rect = section.getBoundingClientRect();
-    const viewportH = window.innerHeight;
-    const progress = Math.max(0, Math.min(1, 1 - Math.abs(rect.top) / viewportH));
-
     const content = section.querySelector('.content');
-    if (content) {
-      const y = (1 - progress) * 18;
-      const scale = 0.985 + progress * 0.015;
-      content.style.transform = `translate3d(0, ${y}px, 0) scale(${scale})`;
-      content.style.opacity = String(0.72 + progress * 0.28);
-    }
+    if (!content) return;
+
+    const rect = section.getBoundingClientRect();
+    const centerOffset = rect.top + rect.height / 2 - window.innerHeight / 2;
+    const move = Math.max(-18, Math.min(18, centerOffset * -0.03));
+    content.style.transform = `translate3d(0, ${move}px, 0)`;
   });
+
+  updateActiveNavByScroll();
 }
 
-function updateOnScroll() {
-  if (mainContent.classList.contains('locked')) return;
-  updateNavByScroll();
-  updateRevealByViewport();
-  updateParallax();
-  updateSectionDepth();
+function initParallax() {
+  applyParallax();
+
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          applyParallax();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    },
+    { passive: true }
+  );
 }
 
-// -----------------------------
-// SCROLL / SWIPE NAVIGATION
-// -----------------------------
-window.addEventListener(
-  'wheel',
-  (e) => {
-    if (mainContent.classList.contains('locked')) return;
-    if (isProgrammaticScroll) return;
+/* ---------------- COUNTDOWN ---------------- */
 
-    updateOnScroll();
-
-    if (wheelLock) return;
-    if (Math.abs(e.deltaY) < 40) return;
-
-    wheelLock = true;
-
-    if (e.deltaY > 0) {
-      goToNextSection();
-    } else {
-      goToPrevSection();
-    }
-
-    setTimeout(() => {
-      wheelLock = false;
-    }, 850);
-  },
-  { passive: true }
-);
-
-window.addEventListener(
-  'touchstart',
-  (e) => {
-    if (!e.changedTouches || !e.changedTouches.length) return;
-    touchStartY = e.changedTouches[0].clientY;
-    touchStartX = e.changedTouches[0].clientX;
-  },
-  { passive: true }
-);
-
-window.addEventListener(
-  'touchend',
-  (e) => {
-    if (mainContent.classList.contains('locked')) return;
-    if (isProgrammaticScroll) return;
-    if (!e.changedTouches || !e.changedTouches.length) return;
-
-    const touchEndY = e.changedTouches[0].clientY;
-    const touchEndX = e.changedTouches[0].clientX;
-
-    const diffY = touchStartY - touchEndY;
-    const diffX = touchStartX - touchEndX;
-
-    // ล็อกซ้ายขวา ไม่ให้ horizontal swipe มาป่วน
-    if (Math.abs(diffX) > Math.abs(diffY)) return;
-    if (Math.abs(diffY) < 50) return;
-
-    if (diffY > 0) {
-      goToNextSection();
-    } else {
-      goToPrevSection();
-    }
-  },
-  { passive: true }
-);
-
-window.addEventListener('keydown', (e) => {
-  if (mainContent.classList.contains('locked')) return;
-  if (isProgrammaticScroll) return;
-
-  if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
-    e.preventDefault();
-    goToNextSection();
-  }
-
-  if (e.key === 'ArrowUp' || e.key === 'PageUp') {
-    e.preventDefault();
-    goToPrevSection();
-  }
-});
-
-// -----------------------------
-// ALWAYS START FROM FIRST PAGE
-// -----------------------------
-window.addEventListener('load', () => {
-  resetToFirstSection();
-  updateNavByScroll();
-  updateRevealByViewport();
-});
-
-window.addEventListener('pageshow', () => {
-  resetToFirstSection();
-  updateNavByScroll();
-});
-
-window.addEventListener('beforeunload', () => {
-  window.scrollTo(0, 0);
-});
-
-// -----------------------------
-// COUNTDOWN
-// -----------------------------
-// วันงานจริง: 17 เมษายน 2026 เวลา 18:00 น. ประเทศไทย
 const weddingDate = new Date('2026-04-17T18:00:00+07:00').getTime();
 
 const daysEl = document.getElementById('days');
@@ -351,9 +269,8 @@ function updateCountdown() {
 updateCountdown();
 setInterval(updateCountdown, 1000);
 
-// -----------------------------
-// RSVP
-// -----------------------------
+/* ---------------- RSVP ---------------- */
+
 function updateRSVPState() {
   if (!attendanceSelect || !paxSelect || !guestInput || !submitBtn) return;
 
@@ -370,7 +287,7 @@ function updateRSVPState() {
   const ready =
     guestName !== '' &&
     attendance &&
-    (attendance === 'No' || paxSelect.value !== '');
+    (attendance === 'No' || paxSelect.value);
 
   submitBtn.disabled = !ready;
   submitBtn.classList.toggle('enabled', ready);
@@ -386,65 +303,48 @@ rsvpForm?.addEventListener('submit', (e) => {
     thankYouMessage.style.display = 'block';
     setTimeout(() => {
       thankYouMessage.style.display = 'none';
-    }, 2500);
+    }, 2200);
   }
 });
 
-// -----------------------------
-// COPY / OPEN CHAT
-// -----------------------------
+/* ---------------- GIFT BUTTON ---------------- */
+
 copyAccountBtn?.addEventListener('click', () => {
-  const openChatUrl =
-    'https://line.me/ti/g2/hJcYpgcTd5nx5b6lqSgsQ7KLDhPlTvjrlMOQUg?utm_source=invitation&utm_medium=QR_code&utm_campaign=default';
-
-  window.open(openChatUrl, '_blank');
-
-  if (copyToast) {
-    copyToast.textContent = 'กำลังเปิด OpenChat';
-    copyToast.style.display = 'block';
-    setTimeout(() => {
-      copyToast.style.display = 'none';
-    }, 1800);
-  }
+  if (!copyToast) return;
+  copyToast.style.display = 'block';
+  setTimeout(() => {
+    copyToast.style.display = 'none';
+  }, 1800);
 });
 
-// -----------------------------
-// GALLERY
-// -----------------------------
+/* ---------------- GALLERY ---------------- */
+
 thumbs.forEach((thumb) => {
   thumb.addEventListener('click', () => {
     const newSrc = thumb.dataset.src;
     if (!newSrc || !galleryMain) return;
 
     thumbs.forEach((t) => t.classList.remove('active'));
-    thumb.classList.add('active');
 
-    galleryMain.style.opacity = '0.35';
+    galleryMain.style.opacity = '0.2';
+    galleryMain.style.transform = 'scale(1.015)';
 
     setTimeout(() => {
       galleryMain.src = newSrc;
-      galleryMain.onload = () => {
-        galleryMain.style.opacity = '1';
-      };
-    }, 180);
+      thumb.classList.add('active');
+    }, 140);
+
+    galleryMain.onload = () => {
+      galleryMain.style.opacity = '1';
+      galleryMain.style.transform = 'scale(1)';
+    };
   });
 });
 
-// -----------------------------
-// LIVE SCROLL EFFECTS
-// -----------------------------
-window.addEventListener(
-  'scroll',
-  () => {
-    updateOnScroll();
-  },
-  { passive: true }
-);
+/* ---------------- SAFETY ---------------- */
 
-window.addEventListener(
-  'resize',
-  () => {
-    updateOnScroll();
-  },
-  { passive: true }
-);
+window.addEventListener('pageshow', () => {
+  if (window.scrollY < 10) {
+    updateActiveNavByScroll();
+  }
+});
