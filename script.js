@@ -27,8 +27,12 @@ const decorItems = [...document.querySelectorAll('.decor')];
 let currentSectionIndex = 0;
 let musicPlaying = false;
 let wheelLocked = false;
-let touchStartY = 0;
 let isTransitioning = false;
+let touchStartY = 0;
+
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
 
 function cleanSectionState(section) {
   section.classList.remove('enter-from-up', 'enter-from-down', 'exit-to-up', 'exit-to-down');
@@ -57,6 +61,18 @@ function animateDecorForSection(section) {
       el.classList.add('show');
     }, 140 + idx * 120);
   });
+}
+
+function getScroller(section) {
+  return section?.querySelector('.section-scroll') || null;
+}
+
+function resetAllScrollPositions() {
+  sections.forEach((section) => {
+    const scroller = getScroller(section);
+    if (scroller) scroller.scrollTop = 0;
+  });
+  window.scrollTo(0, 0);
 }
 
 function updateNav(activeId) {
@@ -94,6 +110,9 @@ function showSection(index, force = false) {
   nextSection.classList.add('active');
   nextSection.classList.add(direction === 'down' ? 'enter-from-down' : 'enter-from-up');
 
+  const nextScroller = getScroller(nextSection);
+  if (nextScroller) nextScroller.scrollTop = 0;
+
   requestAnimationFrame(() => {
     nextSection.classList.remove('enter-from-down', 'enter-from-up');
     animateDecorForSection(nextSection);
@@ -101,7 +120,6 @@ function showSection(index, force = false) {
   });
 
   updateNav(nextSection.id);
-  history.replaceState(null, '', window.location.pathname);
 
   setTimeout(() => {
     sections.forEach((section) => {
@@ -165,7 +183,9 @@ openInvitationBtn?.addEventListener('click', async () => {
 
   setTimeout(() => {
     inviteOverlay.style.display = 'none';
+    resetAllScrollPositions();
     showSection(0, true);
+    history.replaceState(null, '', window.location.pathname);
     playHeroIntro();
   }, 850);
 });
@@ -193,7 +213,10 @@ navItems.forEach((item) => {
 
     const target = item.getAttribute('href').replace('#', '');
     const index = sections.findIndex((sec) => sec.id === target);
-    if (index >= 0) showSection(index);
+    if (index >= 0) {
+      showSection(index);
+      history.replaceState(null, '', window.location.pathname);
+    }
   });
 });
 
@@ -202,6 +225,15 @@ window.addEventListener(
   (e) => {
     if (mainContent.classList.contains('locked')) return;
     if (wheelLocked || isTransitioning) return;
+
+    const activeSection = sections[currentSectionIndex];
+    const scroller = getScroller(activeSection);
+    if (!scroller) return;
+
+    const atTop = scroller.scrollTop <= 2;
+    const atBottom = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 2;
+
+    if ((e.deltaY > 0 && !atBottom) || (e.deltaY < 0 && !atTop)) return;
 
     wheelLocked = true;
 
@@ -229,13 +261,20 @@ window.addEventListener(
     if (mainContent.classList.contains('locked')) return;
     if (isTransitioning) return;
 
+    const activeSection = sections[currentSectionIndex];
+    const scroller = getScroller(activeSection);
+    if (!scroller) return;
+
     const touchEndY = e.changedTouches[0].clientY;
     const diff = touchStartY - touchEndY;
 
-    if (Math.abs(diff) < 48) return;
+    if (Math.abs(diff) < 54) return;
 
-    if (diff > 0) nextSection();
-    else prevSection();
+    const atTop = scroller.scrollTop <= 2;
+    const atBottom = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 2;
+
+    if (diff > 0 && atBottom) nextSection();
+    if (diff < 0 && atTop) prevSection();
   },
   { passive: true }
 );
@@ -329,10 +368,18 @@ thumbs.forEach((thumb) => {
 
 window.addEventListener('load', () => {
   history.replaceState(null, '', window.location.pathname);
-  if (inviteOverlay) inviteOverlay.classList.add('show');
+  resetAllScrollPositions();
 
   sections.forEach((section, idx) => {
+    cleanSectionState(section);
+    resetReveal(section);
     if (idx === 0) section.classList.add('active');
     else section.classList.remove('active');
   });
+
+  currentSectionIndex = 0;
+
+  if (inviteOverlay) {
+    inviteOverlay.classList.add('show');
+  }
 });
