@@ -22,124 +22,118 @@ const copyToast = document.getElementById('copyToast');
 const galleryMain = document.getElementById('galleryMain');
 const thumbs = [...document.querySelectorAll('.thumb')];
 
-const revealEls = [...document.querySelectorAll('.reveal')];
-const decorEls = [...document.querySelectorAll('.decor')];
 const heroBg = document.querySelector('.hero-fixed-bg');
+const decorEls = [...document.querySelectorAll('.decor')];
+const allRevealEls = [...document.querySelectorAll('.reveal')];
 
 let musicPlaying = false;
+let isProgrammaticScroll = false;
+let activeSectionId = '';
+let touchStartY = 0;
+let touchStartX = 0;
+let wheelLock = false;
 
-if ('scrollRestoration' in history) {
-  history.scrollRestoration = 'manual';
+// -----------------------------
+// FORCE START AT FIRST PAGE
+// -----------------------------
+function resetToFirstSection() {
+  if (!sections.length) return;
+  history.replaceState(null, '', window.location.pathname + window.location.search);
+  requestAnimationFrame(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  });
 }
 
-function forceHomeState() {
-  history.replaceState(null, '', window.location.pathname);
-  window.scrollTo(0, 0);
-  document.documentElement.scrollTop = 0;
-  document.body.scrollTop = 0;
-}
-
+// -----------------------------
+// SECTION / NAV
+// -----------------------------
 function updateNavByScroll() {
-  const triggerY = window.innerHeight * 0.35;
-  let currentId = sections[0]?.id || 'hero';
+  const middle = window.innerHeight * 0.45;
+  let current = sections[0];
 
   for (const section of sections) {
     const rect = section.getBoundingClientRect();
-    if (rect.top <= triggerY && rect.bottom > triggerY) {
-      currentId = section.id;
+    if (rect.top <= middle && rect.bottom >= middle) {
+      current = section;
       break;
     }
   }
 
+  if (!current) return;
+
+  activeSectionId = current.id;
+
   navItems.forEach((item) => {
-    item.classList.toggle(
-      'active',
-      item.getAttribute('href') === `#${currentId}`
-    );
+    item.classList.toggle('active', item.getAttribute('href') === `#${activeSectionId}`);
   });
 }
 
-function initRevealObserver() {
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('show');
-        }
-      });
-    },
-    {
-      threshold: 0.14,
-      rootMargin: '0px 0px -8% 0px'
-    }
-  );
+function smoothScrollToSection(section) {
+  if (!section) return;
+  isProgrammaticScroll = true;
 
-  revealEls.forEach((el) => observer.observe(el));
-}
-
-function initSectionObserver() {
-  const observer = new IntersectionObserver(
-    () => updateNavByScroll(),
-    {
-      threshold: 0.25
-    }
-  );
-
-  sections.forEach((section) => observer.observe(section));
-}
-
-function smoothScrollToSection(id) {
-  const target = document.getElementById(id);
-  if (!target) return;
-
-  target.scrollIntoView({
+  section.scrollIntoView({
     behavior: 'smooth',
     block: 'start'
   });
 
-  history.replaceState(null, '', window.location.pathname);
+  setTimeout(() => {
+    isProgrammaticScroll = false;
+  }, 900);
 }
 
-function updateParallax() {
-  const scrollY = window.scrollY;
-
-  if (heroBg) {
-    heroBg.style.transform = `scale(1.03) translate3d(0, ${scrollY * 0.08}px, 0)`;
+function goToNextSection() {
+  const currentIndex = sections.findIndex((sec) => sec.id === activeSectionId);
+  if (currentIndex >= 0 && currentIndex < sections.length - 1) {
+    smoothScrollToSection(sections[currentIndex + 1]);
   }
-
-  decorEls.forEach((el, index) => {
-    const speed = (index % 3 === 0) ? 0.08 : (index % 3 === 1 ? -0.05 : 0.06);
-    const section = el.closest('.section');
-    if (!section) return;
-
-    const rect = section.getBoundingClientRect();
-    const offset = rect.top * speed;
-    el.style.transform = `translate3d(0, ${offset}px, 0)`;
-  });
 }
 
+function goToPrevSection() {
+  const currentIndex = sections.findIndex((sec) => sec.id === activeSectionId);
+  if (currentIndex > 0) {
+    smoothScrollToSection(sections[currentIndex - 1]);
+  }
+}
+
+navItems.forEach((item) => {
+  item.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (mainContent.classList.contains('locked')) return;
+    const targetId = item.getAttribute('href').replace('#', '');
+    const targetSection = document.getElementById(targetId);
+    smoothScrollToSection(targetSection);
+  });
+});
+
+// -----------------------------
+// OPEN INVITATION
+// -----------------------------
 openInvitationBtn?.addEventListener('click', async () => {
   inviteOverlay.classList.add('hidden');
   mainContent.classList.remove('locked');
 
-  forceHomeState();
+  resetToFirstSection();
 
   try {
     await bgm.play();
     musicPlaying = true;
     if (musicIcon) musicIcon.textContent = 'pause';
-  } catch (_) {}
+  } catch (_) {
+    musicPlaying = false;
+    if (musicIcon) musicIcon.textContent = 'music_note';
+  }
 
   setTimeout(() => {
-    inviteOverlay.style.display = 'none';
-    revealEls.forEach((el, idx) => {
-      if (idx < 6) {
-        setTimeout(() => el.classList.add('show'), idx * 80);
-      }
-    });
-  }, 850);
+    if (inviteOverlay) inviteOverlay.style.display = 'none';
+    runInitialAnimations();
+    updateOnScroll();
+  }, 700);
 });
 
+// -----------------------------
+// MUSIC
+// -----------------------------
 musicBtn?.addEventListener('click', async () => {
   try {
     if (musicPlaying) {
@@ -154,18 +148,176 @@ musicBtn?.addEventListener('click', async () => {
   } catch (_) {}
 });
 
-navItems.forEach((item) => {
-  item.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (mainContent.classList.contains('locked')) return;
-
-    const targetId = item.getAttribute('href').replace('#', '');
-    smoothScrollToSection(targetId);
+// -----------------------------
+// REVEAL / APPLE-LIKE MOVEMENT
+// -----------------------------
+function runInitialAnimations() {
+  allRevealEls.forEach((el, i) => {
+    setTimeout(() => {
+      el.classList.add('show');
+    }, 120 + i * 70);
   });
+}
+
+function updateRevealByViewport() {
+  const triggerPoint = window.innerHeight * 0.88;
+
+  allRevealEls.forEach((el) => {
+    const rect = el.getBoundingClientRect();
+
+    if (rect.top < triggerPoint && rect.bottom > 0) {
+      el.classList.add('show');
+    } else if (rect.top > window.innerHeight || rect.bottom < 0) {
+      el.classList.remove('show');
+    }
+  });
+}
+
+function updateParallax() {
+  const scrollY = window.scrollY;
+
+  if (heroBg) {
+    const scale = 1.02 + Math.min(scrollY * 0.00008, 0.035);
+    const translate = Math.min(scrollY * 0.18, 46);
+    heroBg.style.transform = `translate3d(0, ${translate}px, 0) scale(${scale})`;
+  }
+
+  decorEls.forEach((el, index) => {
+    const speed = (index + 1) * 0.08 + 0.05;
+    const y = scrollY * speed;
+    const x = index % 2 === 0 ? scrollY * 0.015 : -scrollY * 0.015;
+    el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+  });
+}
+
+function updateSectionDepth() {
+  sections.forEach((section) => {
+    const rect = section.getBoundingClientRect();
+    const viewportH = window.innerHeight;
+    const progress = Math.max(0, Math.min(1, 1 - Math.abs(rect.top) / viewportH));
+
+    const content = section.querySelector('.content');
+    if (content) {
+      const y = (1 - progress) * 18;
+      const scale = 0.985 + progress * 0.015;
+      content.style.transform = `translate3d(0, ${y}px, 0) scale(${scale})`;
+      content.style.opacity = String(0.72 + progress * 0.28);
+    }
+  });
+}
+
+function updateOnScroll() {
+  if (mainContent.classList.contains('locked')) return;
+  updateNavByScroll();
+  updateRevealByViewport();
+  updateParallax();
+  updateSectionDepth();
+}
+
+// -----------------------------
+// SCROLL / SWIPE NAVIGATION
+// -----------------------------
+window.addEventListener(
+  'wheel',
+  (e) => {
+    if (mainContent.classList.contains('locked')) return;
+    if (isProgrammaticScroll) return;
+
+    updateOnScroll();
+
+    if (wheelLock) return;
+    if (Math.abs(e.deltaY) < 40) return;
+
+    wheelLock = true;
+
+    if (e.deltaY > 0) {
+      goToNextSection();
+    } else {
+      goToPrevSection();
+    }
+
+    setTimeout(() => {
+      wheelLock = false;
+    }, 850);
+  },
+  { passive: true }
+);
+
+window.addEventListener(
+  'touchstart',
+  (e) => {
+    if (!e.changedTouches || !e.changedTouches.length) return;
+    touchStartY = e.changedTouches[0].clientY;
+    touchStartX = e.changedTouches[0].clientX;
+  },
+  { passive: true }
+);
+
+window.addEventListener(
+  'touchend',
+  (e) => {
+    if (mainContent.classList.contains('locked')) return;
+    if (isProgrammaticScroll) return;
+    if (!e.changedTouches || !e.changedTouches.length) return;
+
+    const touchEndY = e.changedTouches[0].clientY;
+    const touchEndX = e.changedTouches[0].clientX;
+
+    const diffY = touchStartY - touchEndY;
+    const diffX = touchStartX - touchEndX;
+
+    // ล็อกซ้ายขวา ไม่ให้ horizontal swipe มาป่วน
+    if (Math.abs(diffX) > Math.abs(diffY)) return;
+    if (Math.abs(diffY) < 50) return;
+
+    if (diffY > 0) {
+      goToNextSection();
+    } else {
+      goToPrevSection();
+    }
+  },
+  { passive: true }
+);
+
+window.addEventListener('keydown', (e) => {
+  if (mainContent.classList.contains('locked')) return;
+  if (isProgrammaticScroll) return;
+
+  if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+    e.preventDefault();
+    goToNextSection();
+  }
+
+  if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+    e.preventDefault();
+    goToPrevSection();
+  }
 });
 
-// countdown
+// -----------------------------
+// ALWAYS START FROM FIRST PAGE
+// -----------------------------
+window.addEventListener('load', () => {
+  resetToFirstSection();
+  updateNavByScroll();
+  updateRevealByViewport();
+});
+
+window.addEventListener('pageshow', () => {
+  resetToFirstSection();
+  updateNavByScroll();
+});
+
+window.addEventListener('beforeunload', () => {
+  window.scrollTo(0, 0);
+});
+
+// -----------------------------
+// COUNTDOWN
+// -----------------------------
+// วันงานจริง: 17 เมษายน 2026 เวลา 18:00 น. ประเทศไทย
 const weddingDate = new Date('2026-04-17T18:00:00+07:00').getTime();
+
 const daysEl = document.getElementById('days');
 const hoursEl = document.getElementById('hours');
 const minutesEl = document.getElementById('minutes');
@@ -199,7 +351,9 @@ function updateCountdown() {
 updateCountdown();
 setInterval(updateCountdown, 1000);
 
+// -----------------------------
 // RSVP
+// -----------------------------
 function updateRSVPState() {
   if (!attendanceSelect || !paxSelect || !guestInput || !submitBtn) return;
 
@@ -216,7 +370,7 @@ function updateRSVPState() {
   const ready =
     guestName !== '' &&
     attendance &&
-    (attendance === 'No' || paxSelect.value);
+    (attendance === 'No' || paxSelect.value !== '');
 
   submitBtn.disabled = !ready;
   submitBtn.classList.toggle('enabled', ready);
@@ -228,26 +382,35 @@ paxSelect?.addEventListener('change', updateRSVPState);
 
 rsvpForm?.addEventListener('submit', (e) => {
   e.preventDefault();
-
   if (thankYouMessage) {
     thankYouMessage.style.display = 'block';
     setTimeout(() => {
       thankYouMessage.style.display = 'none';
-    }, 2200);
+    }, 2500);
   }
 });
 
-// toast
+// -----------------------------
+// COPY / OPEN CHAT
+// -----------------------------
 copyAccountBtn?.addEventListener('click', () => {
-  if (!copyToast) return;
+  const openChatUrl =
+    'https://line.me/ti/g2/hJcYpgcTd5nx5b6lqSgsQ7KLDhPlTvjrlMOQUg?utm_source=invitation&utm_medium=QR_code&utm_campaign=default';
 
-  copyToast.style.display = 'block';
-  setTimeout(() => {
-    copyToast.style.display = 'none';
-  }, 1800);
+  window.open(openChatUrl, '_blank');
+
+  if (copyToast) {
+    copyToast.textContent = 'กำลังเปิด OpenChat';
+    copyToast.style.display = 'block';
+    setTimeout(() => {
+      copyToast.style.display = 'none';
+    }, 1800);
+  }
 });
 
-// gallery
+// -----------------------------
+// GALLERY
+// -----------------------------
 thumbs.forEach((thumb) => {
   thumb.addEventListener('click', () => {
     const newSrc = thumb.dataset.src;
@@ -255,25 +418,33 @@ thumbs.forEach((thumb) => {
 
     thumbs.forEach((t) => t.classList.remove('active'));
     thumb.classList.add('active');
-    galleryMain.src = newSrc;
+
+    galleryMain.style.opacity = '0.35';
+
+    setTimeout(() => {
+      galleryMain.src = newSrc;
+      galleryMain.onload = () => {
+        galleryMain.style.opacity = '1';
+      };
+    }, 180);
   });
 });
 
-// scroll listeners
-window.addEventListener('scroll', () => {
-  updateNavByScroll();
-  updateParallax();
-}, { passive: true });
+// -----------------------------
+// LIVE SCROLL EFFECTS
+// -----------------------------
+window.addEventListener(
+  'scroll',
+  () => {
+    updateOnScroll();
+  },
+  { passive: true }
+);
 
-window.addEventListener('resize', () => {
-  updateNavByScroll();
-  updateParallax();
-});
-
-window.addEventListener('load', () => {
-  forceHomeState();
-  updateNavByScroll();
-  updateParallax();
-  initRevealObserver();
-  initSectionObserver();
-});
+window.addEventListener(
+  'resize',
+  () => {
+    updateOnScroll();
+  },
+  { passive: true }
+);
