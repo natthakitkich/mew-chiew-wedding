@@ -19,7 +19,7 @@ html {
 
 body {
   margin: 0;
-  font-family: 'Noto Sans Thai', sans-serif;
+  font-family: 'Prompt', sans-serif;
   color: var(--ink);
   background: var(--bg-main);
   overflow-x: hidden;
@@ -105,18 +105,35 @@ textarea {
   position: absolute;
   inset: 0;
   background: linear-gradient(
-    180deg,
-    rgba(0,0,0,0.04) 0%,
-    rgba(0,0,0,0.16) 62%,
-    rgba(0,0,0,0.42) 100%
+    0deg,
+    rgba(0,0,0,0.55) 0%,
+    rgba(0,0,0,0.35) 18%,
+    rgba(0,0,0,0.18) 65%,
+    rgba(0,0,0,0) 100%
   );
+}
+
+.hero-blur-layer {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 1;
+  opacity: 1;
+  transition: opacity 1s ease;
+}
+
+.hero-blur-layer.hide {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .hero-content {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   color: var(--white);
-  margin-top: -110px;
+  margin-top: -104px;
   padding: 0 22px;
 }
 
@@ -130,8 +147,8 @@ textarea {
 
 .hero-title {
   font-family: 'Tangerine', cursive;
-  font-size: clamp(54px, 12.5vw, 108px);
-  line-height: 0.82;
+  font-size: clamp(62px, 13.5vw, 118px);
+  line-height: 0.84;
   margin: 0;
   font-weight: 400;
   letter-spacing: 0;
@@ -146,13 +163,33 @@ textarea {
   letter-spacing: 0.02em;
 }
 
+.hero-sequence .reveal-seq,
+.swipe-hint.reveal-seq {
+  opacity: 0;
+  transform: translateY(18px) scale(0.985);
+  transition:
+    opacity 0.9s ease,
+    transform 0.9s ease;
+}
+
+.hero-sequence .reveal-seq.show,
+.swipe-hint.reveal-seq.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.seq-1 { transition-delay: 0.15s; }
+.seq-2 { transition-delay: 0.35s; }
+.seq-3 { transition-delay: 0.55s; }
+.seq-4 { transition-delay: 0.95s; }
+
 .swipe-hint {
   position: absolute;
   bottom: 28px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 2;
-  color: rgba(20, 20, 20, 0.72);
+  z-index: 5;
+  color: rgba(20, 20, 20, 0.9);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -161,11 +198,11 @@ textarea {
 }
 
 .swipe-icon {
-  font-size: 34px !important;
-  animation: bounceUp 1.3s infinite;
+  font-size: 30px !important;
+  animation: swipeBounce 1s infinite;
 }
 
-@keyframes bounceUp {
+@keyframes swipeBounce {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
 }
@@ -173,8 +210,18 @@ textarea {
 /* DECOR */
 .decor {
   position: absolute;
-  z-index: 1;
+  z-index: 2;
   pointer-events: none;
+  opacity: 0;
+  transform: scale(1.08);
+  transition:
+    opacity 1s ease,
+    transform 1s ease;
+}
+
+.decor.show {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .decor-top-right {
@@ -195,7 +242,7 @@ textarea {
   width: min(135px, 24vw);
 }
 
-/* TEXT SYSTEM */
+/* TEXT */
 .hero-title,
 .person-name,
 .section-title,
@@ -211,7 +258,7 @@ textarea {
 .story-copy,
 .form-intro {
   font-size: clamp(14px, 3.6vw, 18px);
-  line-height: 1.7;
+  line-height: 1.75;
 }
 
 /* DARK SECTIONS */
@@ -230,7 +277,7 @@ textarea {
 .quote-text {
   margin: 0 auto 12px;
   font-size: clamp(16px, 4vw, 20px);
-  line-height: 1.9;
+  line-height: 1.95;
   max-width: 620px;
 }
 
@@ -241,7 +288,7 @@ textarea {
 
 .small-title {
   font-size: clamp(42px, 9vw, 72px);
-  line-height: 0.9;
+  line-height: 0.92;
 }
 
 /* COUPLE */
@@ -273,7 +320,7 @@ textarea {
   font-size: clamp(42px, 9vw, 78px);
   color: var(--gold-soft);
   margin: 0 0 6px;
-  line-height: 0.92;
+  line-height: 0.95;
 }
 
 .person-meta,
@@ -325,7 +372,7 @@ textarea {
 
 .section-title {
   font-size: clamp(42px, 10vw, 82px);
-  line-height: 0.9;
+  line-height: 0.92;
   margin: 0 0 14px;
   color: #333;
 }
@@ -379,6 +426,12 @@ textarea {
   color: #111;
   box-shadow: 0 1px 2px rgba(0,0,0,.15);
   cursor: pointer;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.pill-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0,0,0,.16);
 }
 
 .pill-btn.secondary {
@@ -441,10 +494,12 @@ textarea {
   opacity: 0.45;
   cursor: pointer;
   background: none;
+  transition: opacity 0.22s ease, transform 0.22s ease;
 }
 
 .thumb.active {
   opacity: 1;
+  transform: translateY(-1px);
 }
 
 .thumb img {
@@ -506,23 +561,13 @@ textarea {
   color: #fff;
 }
 
-.thank-you,
-.toast {
+.thank-you {
   display: none;
   margin-top: 12px;
   padding: 10px 12px;
   text-align: center;
   color: #fff;
   background: #7b7b7b;
-}
-
-.toast {
-  position: fixed;
-  left: 20px;
-  right: 20px;
-  bottom: 92px;
-  z-index: 1200;
-  box-shadow: 0 1px 8px rgba(50,50,50,0.7);
 }
 
 /* WISHES */
@@ -568,6 +613,20 @@ textarea {
     linear-gradient(rgba(255,255,255,0.72), rgba(255,255,255,0.72)),
     url('images/bg-faza.jpg') center/cover no-repeat;
   backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  transform: translateY(-100%);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    transform 0.75s ease-in-out,
+    opacity 0.75s ease-in-out,
+    visibility 0.75s ease-in-out;
+}
+
+.invite-overlay.show {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
 }
 
 .invite-overlay.hidden {
@@ -621,6 +680,12 @@ textarea {
   color: #fff;
   letter-spacing: .04em;
   cursor: pointer;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.open-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0,0,0,.16);
 }
 
 /* MUSIC */
@@ -639,6 +704,15 @@ textarea {
   place-items: center;
   cursor: pointer;
   box-shadow: var(--shadow);
+}
+
+.music-btn.playing {
+  animation: spinDisk 1s linear infinite;
+}
+
+@keyframes spinDisk {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* BOTTOM NAV */
@@ -678,8 +752,8 @@ textarea {
   opacity: 0;
   transform: translateY(18px);
   transition:
-    opacity 0.55s ease,
-    transform 0.55s ease;
+    opacity 0.7s ease,
+    transform 0.7s ease;
   will-change: opacity, transform;
 }
 
@@ -689,11 +763,11 @@ textarea {
 }
 
 .reveal-left {
-  transform: translateX(-26px);
+  transform: translateX(-24px);
 }
 
 .reveal-right {
-  transform: translateX(26px);
+  transform: translateX(24px);
 }
 
 .reveal-scale {
@@ -730,15 +804,6 @@ textarea {
 }
 
 @media (max-width: 600px) {
-  .count-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .gallery-thumbs {
-    grid-template-columns: repeat(5, 1fr);
-  }
-}
-@media (max-width: 600px) {
   .section {
     padding: 20px 16px 170px;
   }
@@ -762,7 +827,7 @@ textarea {
   }
 
   .hero-title {
-    font-size: clamp(52px, 12vw, 78px);
+    font-size: clamp(56px, 13vw, 82px);
     line-height: 0.86;
     margin: 0;
     max-width: 92%;
