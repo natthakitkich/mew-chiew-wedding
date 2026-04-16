@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600&family=Tangerine:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css?v=10" />
+  <link rel="stylesheet" href="style.css?v=9" />
 </head>
 <body>
   <audio id="bgm" loop preload="auto">
@@ -36,6 +36,7 @@
     <span class="material-icons" id="musicIcon">music_note</span>
   </button>
 
+  
   <main id="mainContent" class="main locked">
     <section class="section hero-section" id="hero" data-section>
       <div class="hero-fixed-bg"></div>
@@ -115,6 +116,7 @@
             <strong>เวลา 18:00 น.</strong>
           </p>
           <img src="images/line3.png" alt="" class="line-img">
+          
         </article>
 
         <article class="event-card reveal reveal-up delay-1">
@@ -162,44 +164,42 @@
         </p>
       </div>
     </section>
+<section class="section gift-section wedding-gift-section" id="wedding-gift" data-section>
+  <img class="decor decor-top-right floating-slower" src="images/bunga-faza-ar.png" alt="">
+  <img class="decor decor-bottom-left floating-soft" src="images/bunga-faza-bl.png" alt="">
+  <img class="decor decor-bottom-right floating-slower" src="images/bunga-faza-br2.png" alt="">
 
-    <section class="section gift-section wedding-gift-section" id="wedding-gift" data-section>
-      <img class="decor decor-top-right floating-slower" src="images/bunga-faza-ar.png" alt="">
-      <img class="decor decor-bottom-left floating-soft" src="images/bunga-faza-bl.png" alt="">
-      <img class="decor decor-bottom-right floating-slower" src="images/bunga-faza-br2.png" alt="">
+  <div class="content narrow center wedding-gift-content">
+    <h2 class="wedding-gift-title reveal reveal-up">ขอของขวัญแต่งงาน</h2>
 
-      <div class="content narrow center wedding-gift-content">
-        <h2 class="wedding-gift-title reveal reveal-up">ขอของขวัญแต่งงาน</h2>
+    <p class="wedding-gift-copy thai-text reveal reveal-up delay-1">
+      การที่คุณมาร่วมงานในวันพิเศษของเราพร้อมกับคำอวยพร
+      คือของขวัญที่ดีที่สุดแล้ว
+      แต่หากต้องการมอบของขวัญเพิ่มเติม
+      สามารถทำได้โดยคลิก “คัดลอกเลขพร้อมเพย์”
+    </p>
 
-        <p class="wedding-gift-copy thai-text reveal reveal-up delay-1">
-          การที่คุณมาร่วมงานในวันพิเศษของเราพร้อมกับคำอวยพร
-          คือของขวัญที่ดีที่สุดแล้ว
-          แต่หากต้องการมอบของขวัญเพิ่มเติม
-          สามารถทำได้โดยคลิก “คัดลอกเลขพร้อมเพย์”
-        </p>
-
-        <div class="wedding-gift-card reveal reveal-up delay-2">
-          <div class="wedding-gift-bank-row">
-            <div class="wedding-gift-bank-info">
-              <h3 class="wedding-gift-name thai-text">มุกตาภา เย็นใจ</h3>
-              <p class="wedding-gift-number english-ui" id="giftAccountNumber"></p>
-            </div>
-
-            <div class="wedding-gift-bank-logo">
-              <img src="images/krungthai-logo.png" alt="Krungthai Bank">
-            </div>
-          </div>
-
-          <button class="wedding-gift-copy-btn thai-text" id="copyGiftAccountBtn" type="button">
-            <span class="material-icons">content_copy</span>
-            <span>คัดลอกเลขพร้อมเพย์</span>
-          </button>
+    <div class="wedding-gift-card reveal reveal-up delay-2">
+      <div class="wedding-gift-bank-row">
+        <div class="wedding-gift-bank-info">
+          <h3 class="wedding-gift-name thai-text">มุกตาภา เย็นใจ</h3>
+          <p class="wedding-gift-number english-ui" id="giftAccountNumber" hidden></p>
         </div>
 
-        <div class="toast thai-text" id="giftCopyToast">คัดลอกเลขบัญชีแล้ว</div>
+        <div class="wedding-gift-bank-logo">
+          <img src="images/krungthai-logo.png" alt="Krungthai Bank">
+        </div>
       </div>
-    </section>
 
+      <button class="wedding-gift-copy-btn thai-text" id="copyGiftAccountBtn" type="button">
+        <span class="material-icons">content_copy</span>
+        <span>คัดลอกเลขพร้อมเพย์</span>
+      </button>
+    </div>
+
+    <div class="toast thai-text" id="giftCopyToast">คัดลอกเลขบัญชีแล้ว</div>
+  </div>
+</section>
     <section class="section gallery-section" id="gallery" data-section>
       <div class="content wide center">
         <div class="gallery-main reveal reveal-scale">
@@ -302,7 +302,6 @@
     </section>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="script.js?v=10"></script>
+  <script src="script.js?v=9"></script>
 </body>
 </html>
