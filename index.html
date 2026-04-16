@@ -2,10 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>งานแต่งงานของ หมิว & เชี่ยว</title>
   <meta name="description" content="เว็บไซต์การ์ดเชิญงานแต่งงานของหมิวและเชี่ยว" />
 
@@ -14,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600&family=Tangerine:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css?v=7" />
+  <link rel="stylesheet" href="style.css?v=8" />
 </head>
 <body>
   <audio id="bgm" loop preload="auto">
@@ -24,7 +21,7 @@
   <div class="invite-overlay" id="inviteOverlay">
     <div class="invite-card">
       <div class="invite-logo-wrap">
-        <div class="invite-logo english-script">M &amp; C</div>
+        <div class="invite-logo english-script"><span>M &amp; C</span></div>
       </div>
       <p class="invite-kicker thai-text">เรียนเชิญ</p>
       <h2 class="invite-guest thai-text" id="guestName">แขกผู้มีเกียรติ</h2>
@@ -48,19 +45,21 @@
   </nav>
 
   <main id="mainContent" class="main locked">
-    <section class="section hero-section active" id="hero" data-section>
+    <section class="section hero-section" id="hero" data-section>
       <div class="hero-fixed-bg"></div>
       <div class="hero-overlay"></div>
       <div class="hero-blur-layer" id="heroBlurLayer"></div>
 
-      <img class="decor decor-top-right" src="images/bunga-faza-ar.png" alt="">
-      <img class="decor decor-bottom-left" src="images/bunga-faza-bl.png" alt="">
-      <img class="decor decor-bottom-right" src="images/bunga-faza-br2.png" alt="">
+      <img class="decor decor-top-right floating-slower" src="images/bunga-faza-ar.png" alt="">
+      <img class="decor decor-bottom-left floating-soft" src="images/bunga-faza-bl.png" alt="">
+      <img class="decor decor-bottom-right floating-slower" src="images/bunga-faza-br2.png" alt="">
 
-      <div class="hero-content hero-sequence" id="heroSequence">
-        <p class="hero-kicker english-ui reveal-seq seq-1">The Wedding Of</p>
-        <h1 class="hero-title english-script reveal-seq seq-2">Mew<br>&amp;<br>Chiew</h1>
-        <p class="hero-date thai-text reveal-seq seq-3">17 . 04 . 2026</p>
+      <div class="content hero-center">
+        <div class="hero-content hero-sequence" id="heroSequence">
+          <p class="hero-kicker english-ui reveal-seq seq-1">The Wedding Of</p>
+          <h1 class="hero-title english-script reveal-seq seq-2">Mew<br>&amp;<br>Chiew</h1>
+          <p class="hero-date thai-text reveal-seq seq-3">17 . 04 . 2026</p>
+        </div>
       </div>
 
       <div class="swipe-hint thai-text reveal-seq seq-4" id="swipeHint">
@@ -69,27 +68,27 @@
       </div>
     </section>
 
-    <section class="section quote-section hidden-section" id="quote" data-section>
+    <section class="section quote-section" id="quote" data-section>
       <div class="section-shell shell-dark">
-        <div class="content narrow center reveal reveal-scale quote-wrap">
-          <p class="quote-text thai-text">
+        <div class="content narrow center quote-wrap">
+          <p class="quote-text thai-text reveal reveal-up">
             มีความยินดีขอเรียนเชิญท่านเพื่อเป็นเกียรติ<br>
             ในงานเลี้ยงฉลองมงคลสมรสระหว่าง
           </p>
-          <h2 class="section-title gold small-title quote-title thai-title">
+          <h2 class="section-title gold small-title quote-title thai-title reveal reveal-scale delay-1">
             มุกตาภา เย็นใจ (หมิว)<br>
             <span class="quote-amp english-script">&amp;</span><br>
             ชูศักดิ์ ผิวดี (น้ำเชี่ยว)
           </h2>
-          <p class="quote-ref thai-text">เพราะความรักของเรามีคุณเป็นพยาน</p>
+          <p class="quote-ref thai-text reveal reveal-up delay-2">เพราะความรักของเรามีคุณเป็นพยาน</p>
         </div>
       </div>
     </section>
 
-    <section class="section couple-section hidden-section" id="couple" data-section>
-      <img class="decor decor-top-right" src="images/bunga-faza-ar.png" alt="">
-      <img class="decor decor-bottom-left" src="images/bunga-faza-bl.png" alt="">
-      <img class="decor decor-bottom-right" src="images/bunga-faza-br2.png" alt="">
+    <section class="section couple-section" id="couple" data-section>
+      <img class="decor decor-top-right floating-slower" src="images/bunga-faza-ar.png" alt="">
+      <img class="decor decor-bottom-left floating-soft" src="images/bunga-faza-bl.png" alt="">
+      <img class="decor decor-bottom-right floating-slower" src="images/bunga-faza-br2.png" alt="">
 
       <div class="couple-frame reveal reveal-scale"></div>
 
@@ -101,9 +100,9 @@
           <p class="person-parent thai-text">ภรันดร เย็นใจ (พ่อ)<br>ธนพรรณ รักขาว (แม่)</p>
         </div>
 
-        <div class="amp english-script reveal reveal-up">&amp;</div>
+        <div class="amp english-script reveal reveal-up delay-1">&amp;</div>
 
-        <div class="person-block reveal reveal-right">
+        <div class="person-block reveal reveal-right delay-2">
           <img src="images/couple-groom.jpg" alt="Groom" class="person-image">
           <h2 class="person-name thai-title">ชูศักดิ์ ผิวดี</h2>
           <p class="person-meta thai-text">(น้ำเชี่ยว)</p>
@@ -112,23 +111,32 @@
       </div>
     </section>
 
-    <section class="section event-section hidden-section" id="event" data-section>
+    <section class="section event-section" id="event" data-section>
       <div class="event-oval outer reveal reveal-scale"></div>
       <div class="event-oval inner reveal reveal-scale delay-1"></div>
 
-      <div class="content narrow center">
+      <div class="content narrow center event-content">
         <article class="event-card reveal reveal-up">
           <h2 class="section-title thai-title">วันงาน</h2>
-          <p class="event-date thai-text"><strong>วันศุกร์ ที่ 17 เมษายน 2026</strong><br><strong>เวลา 18:00 น.</strong></p>
+          <p class="event-date thai-text">
+            <strong>วันศุกร์ ที่ 17 เมษายน 2026</strong><br>
+            <strong>เวลา 18:00 น.</strong>
+          </p>
           <img src="images/line3.png" alt="" class="line-img">
-        
+          
+        </article>
 
         <article class="event-card reveal reveal-up delay-1">
           <h2 class="section-title thai-title">สถานที่จัดงาน</h2>
-          <p class="event-date thai-text"><strong>โรงแรมต้นอ้อยแกรนด์หาดใหญ่</strong></p>
-          <br>ห้องจัดเลี้ยง ชั้น 2</p>
+          <p class="event-date thai-text"><strong>โรงแรมต้นอ้อยแกรนด์หาดใหญ่</strong>
+          <br>
+            ห้องจัดเลี้ยง ชั้น 2 </p>
           <img src="images/line3.png" alt="" class="line-img">
-          <p class="event-location thai-text"><strong>12/12 ถ.คลองเตยพัฒนา</strong><br>ต.คอหงส์ อ.หาดใหญ่ จ.สงขลา<br>(หลัง Big C Extra)</p>
+          <p class="event-location thai-text">
+            <strong>12/12 ถ.คลองเตยพัฒนา</strong><br>
+            ต.คอหงส์ อ.หาดใหญ่ จ.สงขลา<br>
+            (หลัง Big C Extra)
+          </p>
           <a class="pill-btn thai-text" href="https://maps.app.goo.gl/6T3a5Ge1KGMbz2u16?g_st=ic" target="_blank" rel="noopener noreferrer">
             <span class="material-icons">location_on</span>
             <span>เปิดแผนที่</span>
@@ -151,7 +159,20 @@
       </div>
     </section>
 
-    <section class="section gallery-section hidden-section" id="gallery" data-section>
+    <section class="section story-section" id="story" data-section>
+      <img class="decor decor-top-right floating-slower" src="images/bunga-faza-ar.png" alt="">
+      <img class="decor decor-bottom-left floating-soft" src="images/bunga-faza-bl.png" alt="">
+      <img class="decor decor-bottom-right floating-slower" src="images/bunga-faza-br2.png" alt="">
+      <div class="content center narrow">
+        <h2 class="section-title gold thai-title reveal reveal-up">รายละเอียดเพิ่มเติม</h2>
+        <p class="story-copy thai-text reveal reveal-up delay-1">
+          ธีมสีงานแต่ง: ฟ้า / เขียว / เทา / ขาว / น้ำตาล<br>
+          ขอขอบคุณทุกท่านที่มาร่วมเป็นส่วนหนึ่งของวันสำคัญของเรา
+        </p>
+      </div>
+    </section>
+
+    <section class="section gallery-section" id="gallery" data-section>
       <div class="content wide center">
         <div class="gallery-main reveal reveal-scale">
           <img id="galleryMain" src="images/gallery-1.jpg" alt="Gallery main image">
@@ -166,10 +187,38 @@
       </div>
     </section>
 
-    <section class="section rsvp-section hidden-section" id="rsvp" data-section>
-      <img class="decor decor-top-right" src="images/bunga-faza-ar.png" alt="">
-      <img class="decor decor-bottom-left" src="images/bunga-faza-bl.png" alt="">
-      <img class="decor decor-bottom-right" src="images/bunga-faza-br2.png" alt="">
+    <section class="section gift-section" id="gift" data-section>
+      <img class="decor decor-top-right floating-slower" src="images/bunga-faza-ar.png" alt="">
+      <img class="decor decor-bottom-left floating-soft" src="images/bunga-faza-bl.png" alt="">
+      <img class="decor decor-bottom-right floating-slower" src="images/bunga-faza-br2.png" alt="">
+
+      <div class="content narrow center">
+        <h2 class="section-title gold thai-title reveal reveal-up">ร่วมแสดงความยินดี</h2>
+        <p class="section-copy thai-text reveal reveal-up delay-1">
+          สามารถฝากข้อความถึงบ่าวสาวผ่าน LINE OpenChat ได้โดยตรง
+        </p>
+        <div class="gift-card reveal reveal-up delay-2">
+          <div>
+            <strong class="thai-text">ร่วมแสดงความยินดี</strong><br>
+            <span class="thai-text">กดปุ่มด้านขวาเพื่อเข้า OpenChat</span>
+          </div>
+          <a
+            class="pill-btn small thai-text"
+            href="https://line.me/ti/g2/hJcYpgcTd5nx5b6lqSgsQ7KLDhPlTvjrlMOQUg?utm_source=invitation&utm_medium=QR_code&utm_campaign=default"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span class="material-icons">forum</span>
+            <span>เข้า OpenChat</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section rsvp-section" id="rsvp" data-section>
+      <img class="decor decor-top-right floating-slower" src="images/bunga-faza-ar.png" alt="">
+      <img class="decor decor-bottom-left floating-soft" src="images/bunga-faza-bl.png" alt="">
+      <img class="decor decor-bottom-right floating-slower" src="images/bunga-faza-br2.png" alt="">
 
       <div class="form-panel"></div>
 
@@ -203,8 +252,28 @@
         </form>
       </div>
     </section>
+
+    <section class="section wishes-section" id="wishes" data-section>
+      <div class="wishes-panel"></div>
+      <div class="content narrow">
+        <div class="wishes-list reveal reveal-up" id="wishesList">
+          <article class="wish-item">
+            <p class="thai-text">ขอให้รักกันนาน ๆ มีความสุขมาก ๆ ในทุกช่วงเวลาของชีวิตคู่</p>
+            <h3 class="thai-title">แขกผู้มีเกียรติ</h3>
+          </article>
+          <article class="wish-item">
+            <p class="thai-text">ยินดีด้วยนะคะ ขอให้วันสำคัญวันนี้เต็มไปด้วยรอยยิ้มและความทรงจำที่อบอุ่น</p>
+            <h3 class="thai-title">เพื่อนของบ่าวสาว</h3>
+          </article>
+          <article class="wish-item">
+            <p class="thai-text">ขอให้ทั้งสองคนมีชีวิตคู่ที่สดใส สมหวัง และเติบโตไปด้วยกันอย่างงดงาม</p>
+            <h3 class="thai-title">ครอบครัว</h3>
+          </article>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <script src="script.js?v=7"></script>
+  <script src="script.js?v=8"></script>
 </body>
 </html>
