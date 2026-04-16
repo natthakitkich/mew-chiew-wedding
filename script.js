@@ -25,6 +25,9 @@ const heroBlurLayer = document.getElementById('heroBlurLayer');
 const decorEls = [...document.querySelectorAll('.decor')];
 const wishesList = document.getElementById('wishesList');
 
+const APPS_SCRIPT_URL =
+  'https://script.google.com/macros/s/AKfycbzclfdZRNKPk6GCKgGnOUbjWnIH3PHXi0UDSwoNhjlABroBLgoPlrlt5R4Q7fXtKn9d/exec';
+
 let musicPlaying = false;
 let ticking = false;
 let revealObserver = null;
@@ -318,33 +321,90 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-rsvpForm?.addEventListener('submit', (e) => {
+async function saveRSVPToGoogleSheet(payload) {
+  const response = await fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'text/plain;charset=utf-8'
+    },
+    body: JSON.stringify(payload)
+  });
+
+  const text = await response.text();
+
+  try {
+    return JSON.parse(text);
+  } catch (_) {
+    return { ok: false, message: 'Invalid server response', raw: text };
+  }
+}
+
+rsvpForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const guestName = guestInput.value.trim() || 'แขกผู้มีเกียรติ';
-  const wishText = wishInput?.value.trim();
+  const guestName = guestInput?.value.trim() || 'แขกผู้มีเกียรติ';
+  const attendance = attendanceSelect?.value || '';
+  const pax = paxSelect?.value || '';
+  const wishText = wishInput?.value.trim() || '';
 
-  if (wishText && wishesList) {
-    const article = document.createElement('article');
-    article.className = 'wish-item';
-    article.innerHTML = `
-      <p class="thai-text">${escapeHtml(wishText)}</p>
-      <h3 class="thai-title">${escapeHtml(guestName)}</h3>
-    `;
-    wishesList.prepend(article);
+  if (!guestName || !attendance) return;
+
+  const originalButtonText = submitBtn?.textContent || 'ส่งข้อมูล';
+
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.classList.remove('enabled');
+    submitBtn.textContent = 'กำลังส่งข้อมูล...';
   }
 
-  if (thankYouMessage) {
-    thankYouMessage.style.display = 'block';
-    setTimeout(() => {
-      thankYouMessage.style.display = 'none';
-    }, 2200);
-  }
+  try {
+    const result = await saveRSVPToGoogleSheet({
+      name: guestName,
+      attendance,
+      pax,
+      wish: wishText,
+      userAgent: navigator.userAgent
+    });
 
-  rsvpForm.reset();
-  paxSelect.disabled = true;
-  submitBtn.disabled = true;
-  submitBtn.classList.remove('enabled');
+    if (!result.ok) {
+      throw new Error(result.message || 'Save failed');
+    }
+
+    if (wishText && wishesList) {
+      const article = document.createElement('article');
+      article.className = 'wish-item';
+      article.innerHTML = `
+        <p class="thai-text">${escapeHtml(wishText)}</p>
+        <h3 class="thai-title">${escapeHtml(guestName)}</h3>
+      `;
+      wishesList.prepend(article);
+    }
+
+    if (thankYouMessage) {
+      thankYouMessage.style.display = 'block';
+      thankYouMessage.textContent = 'ส่งข้อมูลเรียบร้อยแล้ว';
+      setTimeout(() => {
+        thankYouMessage.style.display = 'none';
+      }, 2200);
+    }
+
+    rsvpForm.reset();
+    paxSelect.disabled = true;
+  } catch (error) {
+    if (thankYouMessage) {
+      thankYouMessage.style.display = 'block';
+      thankYouMessage.textContent = 'ส่งข้อมูลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง';
+      setTimeout(() => {
+        thankYouMessage.style.display = 'none';
+      }, 2600);
+    }
+    console.error('RSVP save error:', error);
+  } finally {
+    if (submitBtn) {
+      submitBtn.textContent = originalButtonText;
+      updateRSVPState();
+    }
+  }
 });
 
 /* ---------------- GALLERY ---------------- */
