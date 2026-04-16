@@ -983,3 +983,10 @@ textarea {
     font-size: 11px;
   }
 }
+.story-section .story-copy {
+  color: #fff;
+}
+
+.gift-section .section-copy {
+  color: #fff;
+}
