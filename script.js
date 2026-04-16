@@ -16,26 +16,20 @@ const submitBtn = document.getElementById('submitBtn');
 const rsvpForm = document.getElementById('rsvpForm');
 const thankYouMessage = document.getElementById('thankYouMessage');
 
+const copyAccountBtn = document.getElementById('copyAccountBtn');
+const copyToast = document.getElementById('copyToast');
+
 const galleryMain = document.getElementById('galleryMain');
 const thumbs = [...document.querySelectorAll('.thumb')];
-
-const heroBlurLayer = document.getElementById('heroBlurLayer');
-const heroSequenceItems = [...document.querySelectorAll('.hero-sequence .reveal-seq')];
-const swipeHint = document.getElementById('swipeHint');
-const decorItems = [...document.querySelectorAll('.decor')];
 
 let currentSectionIndex = 0;
 let musicPlaying = false;
 let wheelLocked = false;
-let isTransitioning = false;
 let touchStartY = 0;
+let isTransitioning = false;
 
 if ('scrollRestoration' in history) {
   history.scrollRestoration = 'manual';
-}
-
-function cleanSectionState(section) {
-  section.classList.remove('enter-from-up', 'enter-from-down', 'exit-to-up', 'exit-to-down');
 }
 
 function resetReveal(section) {
@@ -49,36 +43,24 @@ function playReveal(section) {
   revealItems.forEach((el, idx) => {
     setTimeout(() => {
       el.classList.add('show');
-    }, 90 + idx * 85);
+    }, 70 + idx * 55);
   });
-}
-
-function animateDecorForSection(section) {
-  const localDecor = [...section.querySelectorAll('.decor')];
-  localDecor.forEach((el) => el.classList.remove('show'));
-  localDecor.forEach((el, idx) => {
-    setTimeout(() => {
-      el.classList.add('show');
-    }, 140 + idx * 120);
-  });
-}
-
-function getScroller(section) {
-  return section?.querySelector('.section-scroll') || null;
-}
-
-function resetAllScrollPositions() {
-  sections.forEach((section) => {
-    const scroller = getScroller(section);
-    if (scroller) scroller.scrollTop = 0;
-  });
-  window.scrollTo(0, 0);
 }
 
 function updateNav(activeId) {
   navItems.forEach((item) => {
     item.classList.toggle('active', item.getAttribute('href') === `#${activeId}`);
   });
+}
+
+function scrollPageTop() {
+  window.scrollTo({
+    top: 0,
+    left: 0,
+    behavior: 'auto'
+  });
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
 }
 
 function showSection(index, force = false) {
@@ -89,47 +71,30 @@ function showSection(index, force = false) {
     return;
   }
 
-  const previousIndex = currentSectionIndex;
-  const direction = nextIndex > previousIndex ? 'down' : 'up';
-  const previousSection = sections[previousIndex];
-  const nextSection = sections[nextIndex];
-
   isTransitioning = true;
   currentSectionIndex = nextIndex;
 
-  sections.forEach((section) => {
+  sections.forEach((section, i) => {
+    const isActive = i === currentSectionIndex;
+    section.classList.toggle('active', isActive);
     resetReveal(section);
-    cleanSectionState(section);
   });
 
-  if (previousSection && previousSection !== nextSection) {
-    previousSection.classList.add(direction === 'down' ? 'exit-to-up' : 'exit-to-down');
-    previousSection.classList.remove('active');
-  }
+  const activeSection = sections[currentSectionIndex];
+  const activeId = activeSection.id;
 
-  nextSection.classList.add('active');
-  nextSection.classList.add(direction === 'down' ? 'enter-from-down' : 'enter-from-up');
+  updateNav(activeId);
+  history.replaceState(null, '', window.location.pathname);
 
-  const nextScroller = getScroller(nextSection);
-  if (nextScroller) nextScroller.scrollTop = 0;
+  scrollPageTop();
 
   requestAnimationFrame(() => {
-    nextSection.classList.remove('enter-from-down', 'enter-from-up');
-    animateDecorForSection(nextSection);
-    playReveal(nextSection);
+    playReveal(activeSection);
   });
 
-  updateNav(nextSection.id);
-
   setTimeout(() => {
-    sections.forEach((section) => {
-      if (section !== nextSection) {
-        section.classList.remove('active', 'exit-to-up', 'exit-to-down');
-      }
-      cleanSectionState(section);
-    });
     isTransitioning = false;
-  }, 980);
+  }, 500);
 }
 
 function nextSection() {
@@ -144,49 +109,34 @@ function prevSection() {
   }
 }
 
-function playHeroIntro() {
-  if (heroBlurLayer) {
-    setTimeout(() => {
-      heroBlurLayer.classList.add('hide');
-    }, 80);
-  }
+function forceHomeOnLoad() {
+  history.replaceState(null, '', window.location.pathname);
+  currentSectionIndex = 0;
 
-  decorItems.forEach((el, idx) => {
-    setTimeout(() => {
-      el.classList.add('show');
-    }, 220 + idx * 140);
+  sections.forEach((section, i) => {
+    section.classList.toggle('active', i === 0);
+    resetReveal(section);
   });
 
-  heroSequenceItems.forEach((el) => {
-    setTimeout(() => {
-      el.classList.add('show');
-    }, 520);
-  });
-
-  if (swipeHint) {
-    setTimeout(() => {
-      swipeHint.classList.add('show');
-    }, 980);
-  }
+  updateNav('hero');
+  scrollPageTop();
 }
 
 openInvitationBtn?.addEventListener('click', async () => {
   inviteOverlay.classList.add('hidden');
   mainContent.classList.remove('locked');
 
+  forceHomeOnLoad();
+
   try {
     await bgm.play();
     musicPlaying = true;
     musicIcon.textContent = 'pause';
-    musicBtn.classList.add('playing');
   } catch (_) {}
 
   setTimeout(() => {
     inviteOverlay.style.display = 'none';
-    resetAllScrollPositions();
-    showSection(0, true);
-    history.replaceState(null, '', window.location.pathname);
-    playHeroIntro();
+    playReveal(sections[0]);
   }, 850);
 });
 
@@ -196,12 +146,10 @@ musicBtn?.addEventListener('click', async () => {
       bgm.pause();
       musicPlaying = false;
       musicIcon.textContent = 'music_note';
-      musicBtn.classList.remove('playing');
     } else {
       await bgm.play();
       musicPlaying = true;
       musicIcon.textContent = 'pause';
-      musicBtn.classList.add('playing');
     }
   } catch (_) {}
 });
@@ -213,9 +161,9 @@ navItems.forEach((item) => {
 
     const target = item.getAttribute('href').replace('#', '');
     const index = sections.findIndex((sec) => sec.id === target);
+
     if (index >= 0) {
       showSection(index);
-      history.replaceState(null, '', window.location.pathname);
     }
   });
 });
@@ -226,23 +174,18 @@ window.addEventListener(
     if (mainContent.classList.contains('locked')) return;
     if (wheelLocked || isTransitioning) return;
 
-    const activeSection = sections[currentSectionIndex];
-    const scroller = getScroller(activeSection);
-    if (!scroller) return;
-
-    const atTop = scroller.scrollTop <= 2;
-    const atBottom = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 2;
-
-    if ((e.deltaY > 0 && !atBottom) || (e.deltaY < 0 && !atTop)) return;
+    const atTop = window.scrollY <= 4;
+    const atBottom =
+      window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
 
     wheelLocked = true;
 
-    if (e.deltaY > 10) nextSection();
-    if (e.deltaY < -10) prevSection();
+    if (e.deltaY > 16 && atBottom) nextSection();
+    if (e.deltaY < -16 && atTop) prevSection();
 
     setTimeout(() => {
       wheelLocked = false;
-    }, 900);
+    }, 700);
   },
   { passive: true }
 );
@@ -261,17 +204,14 @@ window.addEventListener(
     if (mainContent.classList.contains('locked')) return;
     if (isTransitioning) return;
 
-    const activeSection = sections[currentSectionIndex];
-    const scroller = getScroller(activeSection);
-    if (!scroller) return;
-
     const touchEndY = e.changedTouches[0].clientY;
     const diff = touchStartY - touchEndY;
 
-    if (Math.abs(diff) < 54) return;
+    if (Math.abs(diff) < 60) return;
 
-    const atTop = scroller.scrollTop <= 2;
-    const atBottom = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 2;
+    const atTop = window.scrollY <= 4;
+    const atBottom =
+      window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
 
     if (diff > 0 && atBottom) nextSection();
     if (diff < 0 && atTop) prevSection();
@@ -287,6 +227,7 @@ window.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowUp' || e.key === 'PageUp') prevSection();
 });
 
+// วันงานจริง: 17 เมษายน 2026 เวลา 18:00 น. ประเทศไทย
 const weddingDate = new Date('2026-04-17T18:00:00+07:00').getTime();
 
 const daysEl = document.getElementById('days');
@@ -335,7 +276,10 @@ function updateRSVPState() {
     paxSelect.value = '';
   }
 
-  const ready = guestName !== '' && attendance && (attendance === 'No' || paxSelect.value);
+  const ready =
+    guestName !== '' &&
+    attendance &&
+    (attendance === 'No' || paxSelect.value);
 
   submitBtn.disabled = !ready;
   submitBtn.classList.toggle('enabled', ready);
@@ -351,8 +295,16 @@ rsvpForm?.addEventListener('submit', (e) => {
     thankYouMessage.style.display = 'block';
     setTimeout(() => {
       thankYouMessage.style.display = 'none';
-    }, 2500);
+    }, 2200);
   }
+});
+
+copyAccountBtn?.addEventListener('click', () => {
+  if (!copyToast) return;
+  copyToast.style.display = 'block';
+  setTimeout(() => {
+    copyToast.style.display = 'none';
+  }, 1800);
 });
 
 thumbs.forEach((thumb) => {
@@ -367,19 +319,5 @@ thumbs.forEach((thumb) => {
 });
 
 window.addEventListener('load', () => {
-  history.replaceState(null, '', window.location.pathname);
-  resetAllScrollPositions();
-
-  sections.forEach((section, idx) => {
-    cleanSectionState(section);
-    resetReveal(section);
-    if (idx === 0) section.classList.add('active');
-    else section.classList.remove('active');
-  });
-
-  currentSectionIndex = 0;
-
-  if (inviteOverlay) {
-    inviteOverlay.classList.add('show');
-  }
+  forceHomeOnLoad();
 });
