@@ -30,6 +30,10 @@ let wheelLocked = false;
 let touchStartY = 0;
 let isTransitioning = false;
 
+function cleanSectionState(section) {
+  section.classList.remove('enter-from-up', 'enter-from-down', 'exit-to-up', 'exit-to-down');
+}
+
 function resetReveal(section) {
   section.querySelectorAll('.reveal').forEach((el) => {
     el.classList.remove('show');
@@ -41,7 +45,17 @@ function playReveal(section) {
   revealItems.forEach((el, idx) => {
     setTimeout(() => {
       el.classList.add('show');
-    }, 80 + idx * 60);
+    }, 90 + idx * 85);
+  });
+}
+
+function animateDecorForSection(section) {
+  const localDecor = [...section.querySelectorAll('.decor')];
+  localDecor.forEach((el) => el.classList.remove('show'));
+  localDecor.forEach((el, idx) => {
+    setTimeout(() => {
+      el.classList.add('show');
+    }, 140 + idx * 120);
   });
 }
 
@@ -51,39 +65,53 @@ function updateNav(activeId) {
   });
 }
 
-function showSection(index) {
-  if (isTransitioning) return;
+function showSection(index, force = false) {
+  if (isTransitioning && !force) return;
 
   const nextIndex = Math.max(0, Math.min(index, sections.length - 1));
-  if (nextIndex === currentSectionIndex && sections[currentSectionIndex]?.classList.contains('active')) {
+  if (!force && nextIndex === currentSectionIndex && sections[currentSectionIndex]?.classList.contains('active')) {
     return;
   }
+
+  const previousIndex = currentSectionIndex;
+  const direction = nextIndex > previousIndex ? 'down' : 'up';
+  const previousSection = sections[previousIndex];
+  const nextSection = sections[nextIndex];
 
   isTransitioning = true;
   currentSectionIndex = nextIndex;
 
-  sections.forEach((section, i) => {
-    const isActive = i === currentSectionIndex;
-    section.classList.toggle('active', isActive);
-    section.classList.toggle('section-visible', isActive);
-    section.classList.toggle('hidden-section', !isActive);
+  sections.forEach((section) => {
     resetReveal(section);
+    cleanSectionState(section);
   });
 
-  const activeSection = sections[currentSectionIndex];
-  const activeId = activeSection.id;
+  if (previousSection && previousSection !== nextSection) {
+    previousSection.classList.add(direction === 'down' ? 'exit-to-up' : 'exit-to-down');
+    previousSection.classList.remove('active');
+  }
 
-  updateNav(activeId);
+  nextSection.classList.add('active');
+  nextSection.classList.add(direction === 'down' ? 'enter-from-down' : 'enter-from-up');
 
   requestAnimationFrame(() => {
-    playReveal(activeSection);
+    nextSection.classList.remove('enter-from-down', 'enter-from-up');
+    animateDecorForSection(nextSection);
+    playReveal(nextSection);
   });
 
-  history.replaceState(null, '', `#${activeId}`);
+  updateNav(nextSection.id);
+  history.replaceState(null, '', window.location.pathname);
 
   setTimeout(() => {
+    sections.forEach((section) => {
+      if (section !== nextSection) {
+        section.classList.remove('active', 'exit-to-up', 'exit-to-down');
+      }
+      cleanSectionState(section);
+    });
     isTransitioning = false;
-  }, 700);
+  }, 980);
 }
 
 function nextSection() {
@@ -98,35 +126,29 @@ function prevSection() {
   }
 }
 
-function initHash() {
-  const hash = window.location.hash.replace('#', '').trim();
-  const foundIndex = sections.findIndex((sec) => sec.id === hash);
-  showSection(foundIndex >= 0 ? foundIndex : 0);
-}
-
 function playHeroIntro() {
   if (heroBlurLayer) {
     setTimeout(() => {
       heroBlurLayer.classList.add('hide');
-    }, 50);
+    }, 80);
   }
 
   decorItems.forEach((el, idx) => {
     setTimeout(() => {
       el.classList.add('show');
-    }, 220 + idx * 120);
+    }, 220 + idx * 140);
   });
 
   heroSequenceItems.forEach((el) => {
     setTimeout(() => {
       el.classList.add('show');
-    }, 500);
+    }, 520);
   });
 
   if (swipeHint) {
     setTimeout(() => {
       swipeHint.classList.add('show');
-    }, 900);
+    }, 980);
   }
 }
 
@@ -143,7 +165,7 @@ openInvitationBtn?.addEventListener('click', async () => {
 
   setTimeout(() => {
     inviteOverlay.style.display = 'none';
-    initHash();
+    showSection(0, true);
     playHeroIntro();
   }, 850);
 });
@@ -171,9 +193,7 @@ navItems.forEach((item) => {
 
     const target = item.getAttribute('href').replace('#', '');
     const index = sections.findIndex((sec) => sec.id === target);
-    if (index >= 0) {
-      showSection(index);
-    }
+    if (index >= 0) showSection(index);
   });
 });
 
@@ -185,12 +205,12 @@ window.addEventListener(
 
     wheelLocked = true;
 
-    if (e.deltaY > 12) nextSection();
-    if (e.deltaY < -12) prevSection();
+    if (e.deltaY > 10) nextSection();
+    if (e.deltaY < -10) prevSection();
 
     setTimeout(() => {
       wheelLocked = false;
-    }, 700);
+    }, 900);
   },
   { passive: true }
 );
@@ -212,7 +232,7 @@ window.addEventListener(
     const touchEndY = e.changedTouches[0].clientY;
     const diff = touchStartY - touchEndY;
 
-    if (Math.abs(diff) < 50) return;
+    if (Math.abs(diff) < 48) return;
 
     if (diff > 0) nextSection();
     else prevSection();
@@ -228,7 +248,6 @@ window.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowUp' || e.key === 'PageUp') prevSection();
 });
 
-// วันงานจริง: 17 เมษายน 2026 เวลา 18:00 น. ประเทศไทย
 const weddingDate = new Date('2026-04-17T18:00:00+07:00').getTime();
 
 const daysEl = document.getElementById('days');
@@ -309,7 +328,11 @@ thumbs.forEach((thumb) => {
 });
 
 window.addEventListener('load', () => {
-  if (inviteOverlay) {
-    inviteOverlay.classList.add('show');
-  }
+  history.replaceState(null, '', window.location.pathname);
+  if (inviteOverlay) inviteOverlay.classList.add('show');
+
+  sections.forEach((section, idx) => {
+    if (idx === 0) section.classList.add('active');
+    else section.classList.remove('active');
+  });
 });
