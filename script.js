@@ -1,12 +1,5 @@
-const SUPABASE_URL = 'https://ihkhlzrgvezjlzywzimr.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_HX_sS13Il4bgHkd4MUaquQ_0cyr-4nV';
+const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwRuagY479TBFymekFQ_VtaaNSt4hM0hbfxD_KXx_I5UWJQyFpsbsycSc_FKd6Xqv90/exec';
 const PROMPTPAY_NUMBER = '0835332099';
-
-const supabase =
-  window.supabase &&
-  window.supabase.createClient
-    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
-    : null;
 
 document.addEventListener('DOMContentLoaded', () => {
   const sections = [...document.querySelectorAll('[data-section]')];
@@ -53,11 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   forceStartAtTop();
-
-  if (giftAccountNumber) {
-    giftAccountNumber.textContent = '';
-    giftAccountNumber.setAttribute('aria-hidden', 'true');
-  }
 
   function runHeroSequence() {
     const seqEls = document.querySelectorAll('.reveal-seq');
@@ -281,21 +269,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  async function loadWishesFromSupabase() {
-    if (!supabase) {
-      console.error('Supabase client not ready');
-      return;
-    }
-
+  async function loadWishesFromSheet() {
     try {
-      const { data, error } = await supabase
-        .from('public_wishes')
-        .select('name, wish, created_at')
-        .order('created_at', { ascending: false })
-        .limit(50);
+      const res = await fetch(SHEET_API_URL);
+      const data = await res.json();
 
-      if (error) throw error;
-      renderWishes(data || []);
+      if (data.success) {
+        renderWishes(data.wishes || []);
+      }
     } catch (err) {
       console.error('Load wishes failed:', err);
     }
@@ -366,83 +347,49 @@ document.addEventListener('DOMContentLoaded', () => {
   rsvpForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    if (!supabase) {
-      alert('ยังไม่สามารถเชื่อมต่อฐานข้อมูลได้');
-      return;
-    }
-
     const payload = {
       name: guestInput?.value.trim() || 'แขกผู้มีเกียรติ',
       attendance: attendanceSelect?.value || '',
-      pax: paxSelect?.value ? Number(paxSelect.value) : null,
+      pax: paxSelect?.value || '',
       wish: wishInput?.value.trim() || ''
     };
 
+    const formData = new URLSearchParams();
+    formData.append('name', payload.name);
+    formData.append('attendance', payload.attendance);
+    formData.append('pax', payload.pax);
+    formData.append('wish', payload.wish);
+
     try {
-      const { error: rsvpError } = await supabase
-        .from('rsvp_submissions')
-        .insert({
-          name: payload.name,
-          attendance: payload.attendance,
-          pax: payload.pax,
-          wish: payload.wish
-        });
+      const res = await fetch(SHEET_API_URL, {
+        method: 'POST',
+        body: formData
+      });
 
-      if (rsvpError) throw rsvpError;
+      const result = await res.json();
 
-      if (payload.wish) {
-        const { error: wishError } = await supabase
-          .from('public_wishes')
-          .insert({
-            name: payload.name,
-            wish: payload.wish
-          });
+      if (result.success) {
+        if (thankYouMessage) {
+          thankYouMessage.style.display = 'block';
+          setTimeout(() => {
+            thankYouMessage.style.display = 'none';
+          }, 2200);
+        }
 
-        if (wishError) throw wishError;
+        rsvpForm.reset();
+        if (paxSelect) paxSelect.disabled = true;
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.classList.remove('enabled');
+        }
+
+        await loadWishesFromSheet();
+      } else {
+        alert('ส่งข้อมูลไม่สำเร็จ');
       }
-
-      if (thankYouMessage) {
-        thankYouMessage.style.display = 'block';
-        setTimeout(() => {
-          thankYouMessage.style.display = 'none';
-        }, 2200);
-      }
-
-      rsvpForm.reset();
-
-      if (paxSelect) {
-        paxSelect.disabled = true;
-        paxSelect.value = '';
-      }
-
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.classList.remove('enabled');
-      }
-
-      await loadWishesFromSupabase();
     } catch (error) {
-      console.error('Submit failed:', error);
-      alert('ส่งข้อมูลไม่สำเร็จ');
-    }
-  });
-
-  copyGiftAccountBtn?.addEventListener('click', async () => {
-    if (!PROMPTPAY_NUMBER || PROMPTPAY_NUMBER === '0835332099') {
-      alert('กรุณาตั้งค่าเลขพร้อมเพย์ในไฟล์ script.js ก่อน');
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(PROMPTPAY_NUMBER);
-      if (giftCopyToast) {
-        giftCopyToast.style.display = 'block';
-        setTimeout(() => {
-          giftCopyToast.style.display = 'none';
-        }, 1800);
-      }
-    } catch (_) {
-      alert('คัดลอกเลขบัญชีไม่สำเร็จ');
+      console.error(error);
+      alert('เชื่อมต่อ Google Sheet ไม่สำเร็จ');
     }
   });
 
@@ -468,6 +415,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  copyGiftAccountBtn?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(PROMPTPAY_NUMBER);
+
+      if (giftAccountNumber) {
+        giftAccountNumber.textContent = PROMPTPAY_NUMBER;
+      }
+
+      if (giftCopyToast) {
+        giftCopyToast.style.display = 'block';
+        setTimeout(() => {
+          giftCopyToast.style.display = 'none';
+        }, 1800);
+      }
+    } catch (_) {
+      alert('คัดลอกเลขบัญชีไม่สำเร็จ');
+    }
+  });
+
   window.addEventListener('pageshow', () => {
     if (window.scrollY < 10) {
       updateActiveNavByScroll();
@@ -480,5 +446,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initNavObserver();
   initParallax();
   runInitialStaticReveal();
-  loadWishesFromSupabase();
+  loadWishesFromSheet();
 });
