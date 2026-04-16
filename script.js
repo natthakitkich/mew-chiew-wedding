@@ -32,8 +32,6 @@ let ticking = false;
 let revealObserver = null;
 let navObserver = null;
 
-/* ---------------- FIRST LOAD TO TOP ---------------- */
-
 function forceStartAtTop() {
   if (location.hash) {
     history.replaceState(null, '', location.pathname + location.search);
@@ -51,8 +49,6 @@ window.addEventListener('load', () => {
   runInitialStaticReveal();
   loadWishesFromSheet();
 });
-
-/* ---------------- OPEN INVITATION ---------------- */
 
 function runHeroSequence() {
   const seqEls = document.querySelectorAll('.reveal-seq');
@@ -97,8 +93,6 @@ openInvitationBtn?.addEventListener('click', async () => {
   }, 850);
 });
 
-/* ---------------- MUSIC ---------------- */
-
 musicBtn?.addEventListener('click', async () => {
   try {
     if (musicPlaying) {
@@ -112,8 +106,6 @@ musicBtn?.addEventListener('click', async () => {
     }
   } catch (_) {}
 });
-
-/* ---------------- NAV CLICK ---------------- */
 
 navItems.forEach((item) => {
   item.addEventListener('click', (e) => {
@@ -131,8 +123,6 @@ navItems.forEach((item) => {
     });
   });
 });
-
-/* ---------------- REVEAL ON SCROLL ---------------- */
 
 function initRevealObserver() {
   if (revealObserver) revealObserver.disconnect();
@@ -155,8 +145,6 @@ function initRevealObserver() {
     revealObserver.observe(el);
   });
 }
-
-/* ---------------- ACTIVE NAV ---------------- */
 
 function setActiveNav(id) {
   navItems.forEach((item) => {
@@ -193,8 +181,6 @@ function initNavObserver() {
 
   sections.forEach((section) => navObserver.observe(section));
 }
-
-/* ---------------- PARALLAX ---------------- */
 
 function applyParallax() {
   const scrollY = window.scrollY;
@@ -249,8 +235,6 @@ function initParallax() {
   );
 }
 
-/* ---------------- COUNTDOWN ---------------- */
-
 const weddingDate = new Date('2026-04-17T18:00:00+07:00').getTime();
 
 const daysEl = document.getElementById('days');
@@ -286,8 +270,6 @@ function updateCountdown() {
 updateCountdown();
 setInterval(updateCountdown, 1000);
 
-/* ---------------- RSVP STATE ---------------- */
-
 function updateRSVPState() {
   if (!attendanceSelect || !paxSelect || !guestInput || !submitBtn) return;
 
@@ -313,8 +295,6 @@ function updateRSVPState() {
 guestInput?.addEventListener('input', updateRSVPState);
 attendanceSelect?.addEventListener('change', updateRSVPState);
 paxSelect?.addEventListener('change', updateRSVPState);
-
-/* ---------------- GOOGLE SHEET ---------------- */
 
 function escapeHtml(text) {
   const div = document.createElement('div');
@@ -371,68 +351,20 @@ rsvpForm?.addEventListener('submit', async (e) => {
     wish: wishInput?.value.trim() || ''
   };
 
+  const formData = new URLSearchParams();
+  formData.append('name', payload.name);
+  formData.append('attendance', payload.attendance);
+  formData.append('pax', payload.pax);
+  formData.append('wish', payload.wish);
+
   try {
     const res = await fetch(SHEET_API_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8'
-      },
-      body: JSON.stringify(payload)
+      body: formData
     });
 
     const result = await res.json();
 
     if (result.success) {
       if (thankYouMessage) {
-        thankYouMessage.style.display = 'block';
-        setTimeout(() => {
-          thankYouMessage.style.display = 'none';
-        }, 2200);
-      }
-
-      rsvpForm.reset();
-      paxSelect.disabled = true;
-      submitBtn.disabled = true;
-      submitBtn.classList.remove('enabled');
-
-      await loadWishesFromSheet();
-    } else {
-      alert('ส่งข้อมูลไม่สำเร็จ');
-    }
-  } catch (error) {
-    console.error(error);
-    alert('เชื่อมต่อ Google Sheet ไม่สำเร็จ');
-  }
-});
-
-/* ---------------- GALLERY ---------------- */
-
-thumbs.forEach((thumb) => {
-  thumb.addEventListener('click', () => {
-    const newSrc = thumb.dataset.src;
-    if (!newSrc || !galleryMain) return;
-
-    thumbs.forEach((t) => t.classList.remove('active'));
-
-    galleryMain.style.opacity = '0.2';
-    galleryMain.style.transform = 'scale(1.015)';
-
-    setTimeout(() => {
-      galleryMain.src = newSrc;
-      thumb.classList.add('active');
-    }, 140);
-
-    galleryMain.onload = () => {
-      galleryMain.style.opacity = '1';
-      galleryMain.style.transform = 'scale(1)';
-    };
-  });
-});
-
-/* ---------------- SAFETY ---------------- */
-
-window.addEventListener('pageshow', () => {
-  if (window.scrollY < 10) {
-    updateActiveNavByScroll();
-  }
-});
+        thankYouMe
