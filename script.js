@@ -22,121 +22,121 @@ const copyToast = document.getElementById('copyToast');
 const galleryMain = document.getElementById('galleryMain');
 const thumbs = [...document.querySelectorAll('.thumb')];
 
-let currentSectionIndex = 0;
+const revealEls = [...document.querySelectorAll('.reveal')];
+const decorEls = [...document.querySelectorAll('.decor')];
+const heroBg = document.querySelector('.hero-fixed-bg');
+
 let musicPlaying = false;
-let wheelLocked = false;
-let touchStartY = 0;
-let isTransitioning = false;
 
 if ('scrollRestoration' in history) {
   history.scrollRestoration = 'manual';
 }
 
-function resetReveal(section) {
-  section.querySelectorAll('.reveal').forEach((el) => {
-    el.classList.remove('show');
-  });
-}
-
-function playReveal(section) {
-  const revealItems = [...section.querySelectorAll('.reveal')];
-  revealItems.forEach((el, idx) => {
-    setTimeout(() => {
-      el.classList.add('show');
-    }, 70 + idx * 55);
-  });
-}
-
-function updateNav(activeId) {
-  navItems.forEach((item) => {
-    item.classList.toggle('active', item.getAttribute('href') === `#${activeId}`);
-  });
-}
-
-function scrollPageTop() {
-  window.scrollTo({
-    top: 0,
-    left: 0,
-    behavior: 'auto'
-  });
+function forceHomeState() {
+  history.replaceState(null, '', window.location.pathname);
+  window.scrollTo(0, 0);
   document.documentElement.scrollTop = 0;
   document.body.scrollTop = 0;
 }
 
-function showSection(index, force = false) {
-  if (isTransitioning && !force) return;
+function updateNavByScroll() {
+  const triggerY = window.innerHeight * 0.35;
+  let currentId = sections[0]?.id || 'hero';
 
-  const nextIndex = Math.max(0, Math.min(index, sections.length - 1));
-  if (!force && nextIndex === currentSectionIndex && sections[currentSectionIndex]?.classList.contains('active')) {
-    return;
+  for (const section of sections) {
+    const rect = section.getBoundingClientRect();
+    if (rect.top <= triggerY && rect.bottom > triggerY) {
+      currentId = section.id;
+      break;
+    }
   }
 
-  isTransitioning = true;
-  currentSectionIndex = nextIndex;
+  navItems.forEach((item) => {
+    item.classList.toggle(
+      'active',
+      item.getAttribute('href') === `#${currentId}`
+    );
+  });
+}
 
-  sections.forEach((section, i) => {
-    const isActive = i === currentSectionIndex;
-    section.classList.toggle('active', isActive);
-    resetReveal(section);
+function initRevealObserver() {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('show');
+        }
+      });
+    },
+    {
+      threshold: 0.14,
+      rootMargin: '0px 0px -8% 0px'
+    }
+  );
+
+  revealEls.forEach((el) => observer.observe(el));
+}
+
+function initSectionObserver() {
+  const observer = new IntersectionObserver(
+    () => updateNavByScroll(),
+    {
+      threshold: 0.25
+    }
+  );
+
+  sections.forEach((section) => observer.observe(section));
+}
+
+function smoothScrollToSection(id) {
+  const target = document.getElementById(id);
+  if (!target) return;
+
+  target.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
   });
 
-  const activeSection = sections[currentSectionIndex];
-  const activeId = activeSection.id;
-
-  updateNav(activeId);
   history.replaceState(null, '', window.location.pathname);
-
-  scrollPageTop();
-
-  requestAnimationFrame(() => {
-    playReveal(activeSection);
-  });
-
-  setTimeout(() => {
-    isTransitioning = false;
-  }, 500);
 }
 
-function nextSection() {
-  if (currentSectionIndex < sections.length - 1) {
-    showSection(currentSectionIndex + 1);
+function updateParallax() {
+  const scrollY = window.scrollY;
+
+  if (heroBg) {
+    heroBg.style.transform = `scale(1.03) translate3d(0, ${scrollY * 0.08}px, 0)`;
   }
-}
 
-function prevSection() {
-  if (currentSectionIndex > 0) {
-    showSection(currentSectionIndex - 1);
-  }
-}
+  decorEls.forEach((el, index) => {
+    const speed = (index % 3 === 0) ? 0.08 : (index % 3 === 1 ? -0.05 : 0.06);
+    const section = el.closest('.section');
+    if (!section) return;
 
-function forceHomeOnLoad() {
-  history.replaceState(null, '', window.location.pathname);
-  currentSectionIndex = 0;
-
-  sections.forEach((section, i) => {
-    section.classList.toggle('active', i === 0);
-    resetReveal(section);
+    const rect = section.getBoundingClientRect();
+    const offset = rect.top * speed;
+    el.style.transform = `translate3d(0, ${offset}px, 0)`;
   });
-
-  updateNav('hero');
-  scrollPageTop();
 }
 
 openInvitationBtn?.addEventListener('click', async () => {
   inviteOverlay.classList.add('hidden');
   mainContent.classList.remove('locked');
 
-  forceHomeOnLoad();
+  forceHomeState();
 
   try {
     await bgm.play();
     musicPlaying = true;
-    musicIcon.textContent = 'pause';
+    if (musicIcon) musicIcon.textContent = 'pause';
   } catch (_) {}
 
   setTimeout(() => {
     inviteOverlay.style.display = 'none';
-    playReveal(sections[0]);
+    revealEls.forEach((el, idx) => {
+      if (idx < 6) {
+        setTimeout(() => el.classList.add('show'), idx * 80);
+      }
+    });
   }, 850);
 });
 
@@ -145,11 +145,11 @@ musicBtn?.addEventListener('click', async () => {
     if (musicPlaying) {
       bgm.pause();
       musicPlaying = false;
-      musicIcon.textContent = 'music_note';
+      if (musicIcon) musicIcon.textContent = 'music_note';
     } else {
       await bgm.play();
       musicPlaying = true;
-      musicIcon.textContent = 'pause';
+      if (musicIcon) musicIcon.textContent = 'pause';
     }
   } catch (_) {}
 });
@@ -159,77 +159,13 @@ navItems.forEach((item) => {
     e.preventDefault();
     if (mainContent.classList.contains('locked')) return;
 
-    const target = item.getAttribute('href').replace('#', '');
-    const index = sections.findIndex((sec) => sec.id === target);
-
-    if (index >= 0) {
-      showSection(index);
-    }
+    const targetId = item.getAttribute('href').replace('#', '');
+    smoothScrollToSection(targetId);
   });
 });
 
-window.addEventListener(
-  'wheel',
-  (e) => {
-    if (mainContent.classList.contains('locked')) return;
-    if (wheelLocked || isTransitioning) return;
-
-    const atTop = window.scrollY <= 4;
-    const atBottom =
-      window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
-
-    wheelLocked = true;
-
-    if (e.deltaY > 16 && atBottom) nextSection();
-    if (e.deltaY < -16 && atTop) prevSection();
-
-    setTimeout(() => {
-      wheelLocked = false;
-    }, 700);
-  },
-  { passive: true }
-);
-
-window.addEventListener(
-  'touchstart',
-  (e) => {
-    touchStartY = e.changedTouches[0].clientY;
-  },
-  { passive: true }
-);
-
-window.addEventListener(
-  'touchend',
-  (e) => {
-    if (mainContent.classList.contains('locked')) return;
-    if (isTransitioning) return;
-
-    const touchEndY = e.changedTouches[0].clientY;
-    const diff = touchStartY - touchEndY;
-
-    if (Math.abs(diff) < 60) return;
-
-    const atTop = window.scrollY <= 4;
-    const atBottom =
-      window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
-
-    if (diff > 0 && atBottom) nextSection();
-    if (diff < 0 && atTop) prevSection();
-  },
-  { passive: true }
-);
-
-window.addEventListener('keydown', (e) => {
-  if (mainContent.classList.contains('locked')) return;
-  if (isTransitioning) return;
-
-  if (e.key === 'ArrowDown' || e.key === 'PageDown') nextSection();
-  if (e.key === 'ArrowUp' || e.key === 'PageUp') prevSection();
-});
-
-// วันงานจริง: 17 เมษายน 2026 เวลา 18:00 น. ประเทศไทย
+// countdown
 const weddingDate = new Date('2026-04-17T18:00:00+07:00').getTime();
-
 const daysEl = document.getElementById('days');
 const hoursEl = document.getElementById('hours');
 const minutesEl = document.getElementById('minutes');
@@ -263,6 +199,7 @@ function updateCountdown() {
 updateCountdown();
 setInterval(updateCountdown, 1000);
 
+// RSVP
 function updateRSVPState() {
   if (!attendanceSelect || !paxSelect || !guestInput || !submitBtn) return;
 
@@ -291,6 +228,7 @@ paxSelect?.addEventListener('change', updateRSVPState);
 
 rsvpForm?.addEventListener('submit', (e) => {
   e.preventDefault();
+
   if (thankYouMessage) {
     thankYouMessage.style.display = 'block';
     setTimeout(() => {
@@ -299,14 +237,17 @@ rsvpForm?.addEventListener('submit', (e) => {
   }
 });
 
+// toast
 copyAccountBtn?.addEventListener('click', () => {
   if (!copyToast) return;
+
   copyToast.style.display = 'block';
   setTimeout(() => {
     copyToast.style.display = 'none';
   }, 1800);
 });
 
+// gallery
 thumbs.forEach((thumb) => {
   thumb.addEventListener('click', () => {
     const newSrc = thumb.dataset.src;
@@ -318,6 +259,21 @@ thumbs.forEach((thumb) => {
   });
 });
 
+// scroll listeners
+window.addEventListener('scroll', () => {
+  updateNavByScroll();
+  updateParallax();
+}, { passive: true });
+
+window.addEventListener('resize', () => {
+  updateNavByScroll();
+  updateParallax();
+});
+
 window.addEventListener('load', () => {
-  forceHomeOnLoad();
+  forceHomeState();
+  updateNavByScroll();
+  updateParallax();
+  initRevealObserver();
+  initSectionObserver();
 });
