@@ -986,7 +986,26 @@ textarea {
   font-size: 30px !important;
   animation: bounceUp 1.3s infinite;
 }
+.invite-overlay {
+  z-index: 3000;
+  pointer-events: auto;
+}
 
+.invite-card {
+  position: relative;
+  z-index: 2;
+}
+
+.open-btn {
+  position: relative;
+  z-index: 3;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.open-btn span {
+  pointer-events: none;
+}
 @keyframes bounceUp {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
