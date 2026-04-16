@@ -8,10 +8,10 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;700&family=Tangerine:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Tangerine:wght@400;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css?v=3" />
+  <link rel="stylesheet" href="style.css?v=4" />
 </head>
 <body>
   <audio id="bgm" loop preload="auto">
@@ -25,14 +25,14 @@
       </div>
       <p class="invite-kicker">เรียนเชิญ</p>
       <h2 class="invite-guest" id="guestName">แขกผู้มีเกียรติ</h2>
-      <button class="open-btn" id="openInvitationBtn">
+      <button class="open-btn" id="openInvitationBtn" type="button">
         <span class="material-icons">mail</span>
         <span>เปิดการ์ดเชิญ</span>
       </button>
     </div>
   </div>
 
-  <button class="music-btn" id="musicBtn" aria-label="เปิดหรือปิดเพลง">
+  <button class="music-btn" id="musicBtn" aria-label="เปิดหรือปิดเพลง" type="button">
     <span class="material-icons" id="musicIcon">music_note</span>
   </button>
 
@@ -48,17 +48,20 @@
     <section class="section hero-section active" id="hero" data-section>
       <div class="hero-fixed-bg"></div>
       <div class="hero-overlay"></div>
+
       <img class="decor decor-top-right" src="images/bunga-faza-ar.png" alt="">
       <img class="decor decor-bottom-left" src="images/bunga-faza-bl.png" alt="">
       <img class="decor decor-bottom-right" src="images/bunga-faza-br2.png" alt="">
 
-      <div class="hero-content reveal reveal-up">
-        <p class="hero-kicker">The Wedding Of</p>
-        <h1 class="hero-title">Mew<br>&amp; Chiew</h1>
-        <p class="hero-date">17 . 04 . 2569</p>
+      <div class="hero-blur-layer" id="heroBlurLayer"></div>
+
+      <div class="hero-content hero-sequence" id="heroSequence">
+        <p class="hero-kicker reveal-seq seq-1">The Wedding Of</p>
+        <h1 class="hero-title reveal-seq seq-2">Mew<br>&amp; Chiew</h1>
+        <p class="hero-date reveal-seq seq-3">17 . 04 . 2569</p>
       </div>
 
-      <div class="swipe-hint reveal reveal-up delay-3">
+      <div class="swipe-hint reveal-seq seq-4" id="swipeHint">
         <span class="material-icons swipe-icon">keyboard_double_arrow_up</span>
         <span>เลื่อนขึ้น</span>
       </div>
@@ -71,7 +74,9 @@
             มีความยินดีขอเรียนเชิญท่านเพื่อเป็นเกียรติ<br>
             ในงานเลี้ยงฉลองมงคลสมรสระหว่าง
           </p>
-          <h2 class="section-title gold small-title">มุกตาภา เย็นใจ (หมิว)<br>&amp;<br>ชูศักดิ์ ผิวดี (น้ำเขียว)</h2>
+          <h2 class="section-title gold small-title">
+            มุกตาภา เย็นใจ (หมิว)<br>&amp;<br>ชูศักดิ์ ผิวดี (น้ำเขียว)
+          </h2>
           <p class="quote-ref">เพราะความรักของเรามีคุณเป็นพยาน</p>
         </div>
       </div>
@@ -83,6 +88,7 @@
       <img class="decor decor-bottom-right" src="images/bunga-faza-br2.png" alt="">
 
       <div class="couple-frame reveal reveal-scale"></div>
+
       <div class="content center">
         <div class="person-block reveal reveal-left">
           <img src="images/couple-bride.jpg" alt="Bride" class="person-image">
@@ -158,20 +164,23 @@
       <div class="content narrow center">
         <h2 class="section-title gold reveal reveal-up">ร่วมแสดงความยินดี</h2>
         <p class="section-copy reveal reveal-up delay-1">
-          สามารถร่วมแสดงความยินดีผ่านไลน์โอเพนแชทได้จาก QR Code หน้างาน<br>
-          ขออภัยหากมิได้มาเรียนเชิญด้วยตนเอง
+          สามารถฝากข้อความถึงบ่าวสาวผ่าน LINE OpenChat ได้โดยตรง
         </p>
         <div class="gift-card reveal reveal-up delay-2">
           <div>
-            <strong>ข้อความถึงบ่าวสาว</strong><br>
-            <span id="accountNumber">ขอบคุณที่มาร่วมเป็นสักขีพยานในความรักของเรา</span>
+            <strong>ร่วมแสดงความยินดี</strong><br>
+            <span>กดปุ่มด้านขวาเพื่อเข้า OpenChat</span>
           </div>
-          <button class="pill-btn small" id="copyAccountBtn" type="button">
-            <span class="material-icons">favorite</span>
-            <span>ส่งความยินดี</span>
-          </button>
+          <a
+            class="pill-btn small"
+            href="https://line.me/ti/g2/hJcYpgcTd5nx5b6lqSgsQ7KLDhPlTvjrlMOQUg?utm_source=invitation&utm_medium=QR_code&utm_campaign=default"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span class="material-icons">forum</span>
+            <span>เข้า OpenChat</span>
+          </a>
         </div>
-        <div class="toast" id="copyToast">ขอบคุณสำหรับคำอวยพรของคุณ</div>
       </div>
     </section>
 
@@ -181,11 +190,11 @@
           <img id="galleryMain" src="images/gallery-1.jpg" alt="Gallery main image">
         </div>
         <div class="gallery-thumbs reveal reveal-up delay-1">
-          <button class="thumb active" data-src="images/gallery-1.jpg"><img src="images/gallery-1.jpg" alt=""></button>
-          <button class="thumb" data-src="images/gallery-2.jpg"><img src="images/gallery-2.jpg" alt=""></button>
-          <button class="thumb" data-src="images/gallery-3.jpg"><img src="images/gallery-3.jpg" alt=""></button>
-          <button class="thumb" data-src="images/gallery-4.jpg"><img src="images/gallery-4.jpg" alt=""></button>
-          <button class="thumb" data-src="images/gallery-5.jpg"><img src="images/gallery-5.jpg" alt=""></button>
+          <button class="thumb active" data-src="images/gallery-1.jpg" type="button"><img src="images/gallery-1.jpg" alt=""></button>
+          <button class="thumb" data-src="images/gallery-2.jpg" type="button"><img src="images/gallery-2.jpg" alt=""></button>
+          <button class="thumb" data-src="images/gallery-3.jpg" type="button"><img src="images/gallery-3.jpg" alt=""></button>
+          <button class="thumb" data-src="images/gallery-4.jpg" type="button"><img src="images/gallery-4.jpg" alt=""></button>
+          <button class="thumb" data-src="images/gallery-5.jpg" type="button"><img src="images/gallery-5.jpg" alt=""></button>
         </div>
       </div>
     </section>
@@ -247,6 +256,6 @@
     </section>
   </main>
 
-<script src="script.js?v=3"></script>
+  <script src="script.js?v=4"></script>
 </body>
 </html>
