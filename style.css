@@ -19,9 +19,9 @@
 
 html {
   scroll-behavior: smooth;
-  overflow-x: hidden;
   width: 100%;
   max-width: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -73,13 +73,13 @@ textarea {
   padding:
     calc(var(--safe-top) + 20px)
     16px
-    calc(140px + var(--safe-bottom));
+    calc(138px + var(--safe-bottom));
   background-image: url('images/bg-faza.jpg');
   background-position: center;
   background-size: cover;
   overflow-x: hidden;
   overflow-y: visible;
-  scroll-margin-top: 20px;
+  scroll-margin-top: 24px;
 }
 
 .hidden-section {
@@ -92,6 +92,8 @@ textarea {
   margin: 0 auto;
   position: relative;
   z-index: 2;
+  transform-origin: center top;
+  transition: transform .35s ease, opacity .35s ease;
 }
 
 .content.narrow {
@@ -121,6 +123,7 @@ textarea {
   background-size: cover;
   transform: scale(1.02);
   will-change: transform;
+  transition: transform .25s linear;
 }
 
 .hero-overlay {
@@ -137,7 +140,7 @@ textarea {
 }
 
 .hero-section .content {
-  min-height: calc(100svh - 155px - var(--safe-top) - var(--safe-bottom));
+  min-height: calc(100svh - 150px - var(--safe-top) - var(--safe-bottom));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -146,10 +149,10 @@ textarea {
 .hero-content {
   position: relative;
   z-index: 2;
+  color: var(--white);
+  text-align: center;
   width: min(100%, 430px);
   padding: 0 12px;
-  text-align: center;
-  color: var(--white);
 }
 
 .hero-kicker {
@@ -181,9 +184,9 @@ textarea {
 .swipe-hint {
   position: absolute;
   left: 50%;
-  bottom: calc(106px + var(--safe-bottom));
+  bottom: calc(105px + var(--safe-bottom));
   transform: translateX(-50%);
-  z-index: 2;
+  z-index: 3;
   color: rgba(20,20,20,.84);
   display: flex;
   flex-direction: column;
@@ -209,8 +212,8 @@ textarea {
   position: absolute;
   z-index: 1;
   pointer-events: none;
-  transition: transform .8s ease, opacity .8s ease;
   will-change: transform;
+  transition: transform .25s linear, opacity .5s ease;
 }
 
 .decor-top-right {
@@ -320,17 +323,13 @@ textarea {
   top: calc(var(--safe-top) + 34px);
   left: 12px;
   right: 12px;
-  bottom: calc(118px + var(--safe-bottom));
+  bottom: calc(112px + var(--safe-bottom));
   border: 4px solid #186191;
   box-shadow: 0 0 0 7px rgba(250,250,250,0.2);
   border-radius: 150px;
   background: url('images/60_background.jpg') center/cover no-repeat;
   z-index: 1;
   max-width: calc(100% - 24px);
-}
-
-.couple-content {
-  padding-top: 26px;
 }
 
 .person-block {
@@ -349,25 +348,25 @@ textarea {
 }
 
 .person-name {
-  margin: 0 0 4px;
-  color: var(--gold-soft);
   font-size: clamp(28px, 7vw, 42px);
+  color: var(--gold-soft);
+  margin: 0 0 4px;
   line-height: 1.16;
   font-weight: 500;
 }
 
 .person-meta,
 .person-parent {
-  margin: 0;
   font-size: clamp(14px, 3.8vw, 18px);
   line-height: 1.65;
   font-weight: 300;
+  margin: 0;
 }
 
 .amp {
+  font-size: clamp(34px, 9vw, 56px);
   margin: 4px 0 12px;
   color: #444;
-  font-size: clamp(34px, 9vw, 56px);
 }
 
 /* ---------------- EVENT ---------------- */
@@ -388,32 +387,28 @@ textarea {
 
 .event-oval.outer {
   top: calc(var(--safe-top) + 18px);
-  bottom: calc(118px + var(--safe-bottom));
+  bottom: calc(112px + var(--safe-bottom));
 }
 
 .event-oval.inner {
   top: calc(var(--safe-top) + 28px);
-  bottom: calc(128px + var(--safe-bottom));
+  bottom: calc(122px + var(--safe-bottom));
   left: 14px;
   right: 14px;
   max-width: calc(100% - 28px);
 }
 
-.event-content {
+.event-card {
   position: relative;
   z-index: 2;
-  padding-top: 6px;
-}
-
-.event-card {
   margin-bottom: 18px;
 }
 
 .section-title {
-  margin: 0 0 10px;
-  color: #333;
   font-size: clamp(30px, 9vw, 52px);
   line-height: 1.05;
+  margin: 0 0 10px;
+  color: #333;
   font-weight: 600;
   text-align: center;
 }
@@ -430,11 +425,11 @@ textarea {
 .event-date,
 .event-location,
 .countdown-heading {
-  margin: 0;
-  text-align: center;
   font-size: clamp(15px, 4vw, 18px);
   line-height: 1.58;
   font-weight: 300;
+  margin: 0;
+  text-align: center;
 }
 
 .event-date strong,
@@ -443,6 +438,8 @@ textarea {
 }
 
 .countdown-wrap {
+  position: relative;
+  z-index: 2;
   margin-top: 8px;
 }
 
@@ -518,15 +515,15 @@ textarea {
 }
 
 .gift-card {
-  position: relative;
-  z-index: 2;
-  display: grid;
-  gap: 14px;
   margin-top: 24px;
-  padding: 18px 16px;
   background: rgba(255,255,255,0.72);
   box-shadow: 0 1px 2px rgba(0,0,0,.1);
   border-radius: 12px;
+  padding: 18px 16px;
+  display: grid;
+  gap: 14px;
+  position: relative;
+  z-index: 2;
 }
 
 /* ---------------- GALLERY ---------------- */
@@ -542,6 +539,7 @@ textarea {
   width: 100%;
   aspect-ratio: 4 / 5;
   object-fit: cover;
+  transition: opacity .3s ease;
 }
 
 .gallery-thumbs {
@@ -559,10 +557,12 @@ textarea {
   opacity: 0.48;
   cursor: pointer;
   background: none;
+  transition: opacity .25s ease, transform .25s ease;
 }
 
 .thumb.active {
   opacity: 1;
+  transform: translateY(-1px);
 }
 
 .thumb img {
@@ -578,7 +578,7 @@ textarea {
   top: calc(var(--safe-top) + 24px);
   left: 12px;
   right: 12px;
-  bottom: calc(118px + var(--safe-bottom));
+  bottom: calc(112px + var(--safe-bottom));
   background: rgba(243,243,243,0.92);
   border-radius: 22px;
   box-shadow: 0 1px 6px rgba(108,96,85,0.35);
@@ -662,7 +662,7 @@ textarea {
   top: calc(var(--safe-top) + 24px);
   left: 12px;
   right: 12px;
-  bottom: calc(118px + var(--safe-bottom));
+  bottom: calc(112px + var(--safe-bottom));
   background: rgba(255,255,255,0.62);
   border-radius: 20px;
   box-shadow: 0 1px 4px #777;
@@ -687,8 +687,8 @@ textarea {
 }
 
 .wish-item h3 {
-  margin: 8px 0 0;
   font-size: clamp(24px, 6vw, 34px);
+  margin: 8px 0 0;
   font-family: 'Kanit', 'Noto Sans Thai', sans-serif;
   font-weight: 500;
 }
@@ -746,7 +746,6 @@ textarea {
   white-space: nowrap;
   overflow: hidden;
   padding: 0 12px;
-  letter-spacing: 0;
 }
 
 .invite-kicker {
@@ -824,12 +823,12 @@ textarea {
   border-radius: 999px;
   display: grid;
   place-items: center;
-  text-align: center;
-  white-space: nowrap;
   font-size: 12px;
   font-weight: 500;
   color: #555;
   font-family: 'Kanit', 'Noto Sans Thai', sans-serif;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .nav-item.active {
@@ -841,10 +840,10 @@ textarea {
 
 .reveal {
   opacity: 0;
-  transform: translateY(18px);
+  transform: translate3d(0, 24px, 0);
   transition:
-    opacity 0.55s ease,
-    transform 0.7s ease;
+    opacity 0.8s cubic-bezier(.22,1,.36,1),
+    transform 0.95s cubic-bezier(.22,1,.36,1);
   will-change: opacity, transform;
 }
 
@@ -854,19 +853,19 @@ textarea {
 }
 
 .reveal-left {
-  transform: translateX(-22px);
+  transform: translate3d(-26px, 0, 0);
 }
 
 .reveal-right {
-  transform: translateX(22px);
+  transform: translate3d(26px, 0, 0);
 }
 
 .reveal-scale {
-  transform: scale(.97);
+  transform: scale(.96);
 }
 
 .reveal-up {
-  transform: translateY(22px);
+  transform: translate3d(0, 28px, 0);
 }
 
 .delay-1 {
@@ -922,15 +921,6 @@ body,
   .gift-card {
     grid-template-columns: 1fr auto;
     align-items: center;
-  }
-
-  .bottom-nav {
-    left: 24px;
-    right: 24px;
-  }
-
-  .music-btn {
-    right: 24px;
   }
 }
 
