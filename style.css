@@ -20,17 +20,20 @@
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
 }
 
 body {
   margin: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-x: none;
   font-family: 'Kanit', 'Noto Sans Thai', sans-serif;
   color: var(--ink);
   background: var(--bg-main);
-  overflow-x: hidden;
-  overflow-y: auto;
-  width: 100%;
-  max-width: 100%;
 }
 
 img {
@@ -63,27 +66,29 @@ textarea {
 
 .section {
   position: relative;
-  display: none;
+  display: block;
   width: 100%;
   max-width: 100%;
   min-height: 100svh;
   padding:
     calc(var(--safe-top) + 20px)
     16px
-    calc(130px + var(--safe-bottom));
+    calc(140px + var(--safe-bottom));
   background-image: url('images/bg-faza.jpg');
   background-position: center;
   background-size: cover;
   overflow-x: hidden;
   overflow-y: visible;
+  scroll-margin-top: 20px;
 }
 
-.section.active {
+.hidden-section {
   display: block;
 }
 
 .content {
   width: min(100%, 860px);
+  max-width: 100%;
   margin: 0 auto;
   position: relative;
   z-index: 2;
@@ -106,7 +111,6 @@ textarea {
 .hero-section {
   min-height: 100svh;
   background: transparent;
-  display: block;
 }
 
 .hero-fixed-bg {
@@ -116,11 +120,13 @@ textarea {
   background-position: center;
   background-size: cover;
   transform: scale(1.02);
+  will-change: transform;
 }
 
 .hero-overlay {
   position: absolute;
   inset: 0;
+  z-index: 1;
   background: linear-gradient(
     180deg,
     rgba(255,255,255,0.18) 0%,
@@ -128,11 +134,10 @@ textarea {
     rgba(0,0,0,0.18) 62%,
     rgba(0,0,0,0.45) 100%
   );
-  z-index: 1;
 }
 
 .hero-section .content {
-  min-height: calc(100svh - 150px - var(--safe-top) - var(--safe-bottom));
+  min-height: calc(100svh - 155px - var(--safe-top) - var(--safe-bottom));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -141,10 +146,10 @@ textarea {
 .hero-content {
   position: relative;
   z-index: 2;
-  color: var(--white);
-  text-align: center;
-  width: min(100%, 420px);
+  width: min(100%, 430px);
   padding: 0 12px;
+  text-align: center;
+  color: var(--white);
 }
 
 .hero-kicker {
@@ -176,7 +181,7 @@ textarea {
 .swipe-hint {
   position: absolute;
   left: 50%;
-  bottom: calc(105px + var(--safe-bottom));
+  bottom: calc(106px + var(--safe-bottom));
   transform: translateX(-50%);
   z-index: 2;
   color: rgba(20,20,20,.84);
@@ -204,6 +209,8 @@ textarea {
   position: absolute;
   z-index: 1;
   pointer-events: none;
+  transition: transform .8s ease, opacity .8s ease;
+  will-change: transform;
 }
 
 .decor-top-right {
@@ -279,10 +286,10 @@ textarea {
 
 .quote-text {
   margin: 0 auto 14px;
+  max-width: 620px;
   font-size: clamp(16px, 4.2vw, 22px);
   line-height: 1.75;
   font-weight: 300;
-  max-width: 620px;
 }
 
 .quote-title {
@@ -313,12 +320,13 @@ textarea {
   top: calc(var(--safe-top) + 34px);
   left: 12px;
   right: 12px;
-  bottom: calc(110px + var(--safe-bottom));
+  bottom: calc(118px + var(--safe-bottom));
   border: 4px solid #186191;
   box-shadow: 0 0 0 7px rgba(250,250,250,0.2);
   border-radius: 150px;
   background: url('images/60_background.jpg') center/cover no-repeat;
   z-index: 1;
+  max-width: calc(100% - 24px);
 }
 
 .couple-content {
@@ -341,25 +349,25 @@ textarea {
 }
 
 .person-name {
-  font-size: clamp(28px, 7vw, 42px);
-  color: var(--gold-soft);
   margin: 0 0 4px;
+  color: var(--gold-soft);
+  font-size: clamp(28px, 7vw, 42px);
   line-height: 1.16;
   font-weight: 500;
 }
 
 .person-meta,
 .person-parent {
+  margin: 0;
   font-size: clamp(14px, 3.8vw, 18px);
   line-height: 1.65;
   font-weight: 300;
-  margin: 0;
 }
 
 .amp {
-  font-size: clamp(34px, 9vw, 56px);
   margin: 4px 0 12px;
   color: #444;
+  font-size: clamp(34px, 9vw, 56px);
 }
 
 /* ---------------- EVENT ---------------- */
@@ -375,18 +383,20 @@ textarea {
   border-radius: 300px;
   background: rgba(255,255,255,0.62);
   box-shadow: 0 0 8px rgba(0,0,0,0.22);
+  max-width: calc(100% - 16px);
 }
 
 .event-oval.outer {
   top: calc(var(--safe-top) + 18px);
-  bottom: calc(112px + var(--safe-bottom));
+  bottom: calc(118px + var(--safe-bottom));
 }
 
 .event-oval.inner {
   top: calc(var(--safe-top) + 28px);
-  bottom: calc(122px + var(--safe-bottom));
+  bottom: calc(128px + var(--safe-bottom));
   left: 14px;
   right: 14px;
+  max-width: calc(100% - 28px);
 }
 
 .event-content {
@@ -400,10 +410,10 @@ textarea {
 }
 
 .section-title {
-  font-size: clamp(30px, 9vw, 52px);
-  line-height: 1.05;
   margin: 0 0 10px;
   color: #333;
+  font-size: clamp(30px, 9vw, 52px);
+  line-height: 1.05;
   font-weight: 600;
   text-align: center;
 }
@@ -420,11 +430,11 @@ textarea {
 .event-date,
 .event-location,
 .countdown-heading {
+  margin: 0;
+  text-align: center;
   font-size: clamp(15px, 4vw, 18px);
   line-height: 1.58;
   font-weight: 300;
-  margin: 0;
-  text-align: center;
 }
 
 .event-date strong,
@@ -508,15 +518,15 @@ textarea {
 }
 
 .gift-card {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: 14px;
   margin-top: 24px;
+  padding: 18px 16px;
   background: rgba(255,255,255,0.72);
   box-shadow: 0 1px 2px rgba(0,0,0,.1);
   border-radius: 12px;
-  padding: 18px 16px;
-  display: grid;
-  gap: 14px;
-  position: relative;
-  z-index: 2;
 }
 
 /* ---------------- GALLERY ---------------- */
@@ -568,11 +578,12 @@ textarea {
   top: calc(var(--safe-top) + 24px);
   left: 12px;
   right: 12px;
-  bottom: calc(110px + var(--safe-bottom));
+  bottom: calc(118px + var(--safe-bottom));
   background: rgba(243,243,243,0.92);
   border-radius: 22px;
   box-shadow: 0 1px 6px rgba(108,96,85,0.35);
   z-index: 1;
+  max-width: calc(100% - 24px);
 }
 
 .form-content {
@@ -651,11 +662,12 @@ textarea {
   top: calc(var(--safe-top) + 24px);
   left: 12px;
   right: 12px;
-  bottom: calc(110px + var(--safe-bottom));
+  bottom: calc(118px + var(--safe-bottom));
   background: rgba(255,255,255,0.62);
   border-radius: 20px;
   box-shadow: 0 1px 4px #777;
   z-index: 1;
+  max-width: calc(100% - 24px);
 }
 
 .wishes-list {
@@ -675,8 +687,8 @@ textarea {
 }
 
 .wish-item h3 {
-  font-size: clamp(24px, 6vw, 34px);
   margin: 8px 0 0;
+  font-size: clamp(24px, 6vw, 34px);
   font-family: 'Kanit', 'Noto Sans Thai', sans-serif;
   font-weight: 500;
 }
@@ -726,14 +738,15 @@ textarea {
   align-items: center;
   justify-content: center;
   font-family: 'Tangerine', cursive;
-  font-size: 30px;
+  font-size: 28px;
   line-height: 1;
   color: #fff;
   border: 1px solid rgba(255,255,255,0.35);
   background: rgba(255,255,255,0.08);
   white-space: nowrap;
   overflow: hidden;
-  padding: 0 10px;
+  padding: 0 12px;
+  letter-spacing: 0;
 }
 
 .invite-kicker {
@@ -811,12 +824,12 @@ textarea {
   border-radius: 999px;
   display: grid;
   place-items: center;
+  text-align: center;
+  white-space: nowrap;
   font-size: 12px;
   font-weight: 500;
   color: #555;
   font-family: 'Kanit', 'Noto Sans Thai', sans-serif;
-  text-align: center;
-  white-space: nowrap;
 }
 
 .nav-item.active {
@@ -868,6 +881,32 @@ textarea {
   transition-delay: .24s;
 }
 
+/* ---------------- GLOBAL SAFETY ---------------- */
+
+html,
+body,
+.main,
+.section,
+.content,
+.content.narrow,
+.content.wide {
+  width: 100%;
+  max-width: 100%;
+}
+
+.section * {
+  max-width: 100%;
+  word-wrap: break-word;
+}
+
+.gallery-main,
+.form-panel,
+.wishes-panel,
+.event-oval,
+.couple-frame {
+  max-width: 100%;
+}
+
 /* ---------------- RESPONSIVE ---------------- */
 
 @media (min-width: 768px) {
@@ -883,5 +922,71 @@ textarea {
   .gift-card {
     grid-template-columns: 1fr auto;
     align-items: center;
+  }
+
+  .bottom-nav {
+    left: 24px;
+    right: 24px;
+  }
+
+  .music-btn {
+    right: 24px;
+  }
+}
+
+@media (max-width: 420px) {
+  .section {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .hero-content {
+    width: min(100%, 360px);
+    padding: 0 8px;
+  }
+
+  .hero-title {
+    font-size: clamp(58px, 17vw, 94px);
+  }
+
+  .invite-logo {
+    width: 104px;
+    height: 104px;
+    font-size: 26px;
+    padding: 0 10px;
+  }
+
+  .invite-guest {
+    font-size: clamp(30px, 8vw, 42px);
+  }
+
+  .section-title {
+    font-size: clamp(28px, 8.6vw, 44px);
+  }
+
+  .quote-title,
+  .person-name {
+    font-size: clamp(26px, 7.2vw, 36px);
+  }
+
+  .event-oval.outer {
+    left: 6px;
+    right: 6px;
+  }
+
+  .event-oval.inner {
+    left: 10px;
+    right: 10px;
+  }
+
+  .bottom-nav {
+    left: 10px;
+    right: 10px;
+    gap: 3px;
+    padding: 7px;
+  }
+
+  .nav-item {
+    font-size: 11px;
   }
 }
