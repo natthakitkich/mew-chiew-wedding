@@ -1,4 +1,12 @@
-const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwRuagY479TBFymekFQ_VtaaNSt4hM0hbfxD_KXx_I5UWJQyFpsbsycSc_FKd6Xqv90/exec';
+const SUPABASE_URL = 'https://ihkhlzrgvezjlzywzimr.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_HX_sS13Il4bgHkd4MUaquQ_0cyr-4nV';
+const PROMPTPAY_NUMBER = '0835332099';
+
+const supabase =
+  window.supabase &&
+  window.supabase.createClient
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+    : null;
 
 document.addEventListener('DOMContentLoaded', () => {
   const sections = [...document.querySelectorAll('[data-section]')];
@@ -20,12 +28,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const rsvpForm = document.getElementById('rsvpForm');
   const thankYouMessage = document.getElementById('thankYouMessage');
 
-
   const copyGiftAccountBtn = document.getElementById('copyGiftAccountBtn');
-const giftAccountNumber = document.getElementById('giftAccountNumber');
-const giftCopyToast = document.getElementById('giftCopyToast');
+  const giftAccountNumber = document.getElementById('giftAccountNumber');
+  const giftCopyToast = document.getElementById('giftCopyToast');
 
-  
   const galleryMain = document.getElementById('galleryMain');
   const thumbs = [...document.querySelectorAll('.thumb')];
 
@@ -47,6 +53,11 @@ const giftCopyToast = document.getElementById('giftCopyToast');
   }
 
   forceStartAtTop();
+
+  if (giftAccountNumber) {
+    giftAccountNumber.textContent = '';
+    giftAccountNumber.setAttribute('aria-hidden', 'true');
+  }
 
   function runHeroSequence() {
     const seqEls = document.querySelectorAll('.reveal-seq');
@@ -270,14 +281,21 @@ const giftCopyToast = document.getElementById('giftCopyToast');
     });
   }
 
-  async function loadWishesFromSheet() {
-    try {
-      const res = await fetch(SHEET_API_URL);
-      const data = await res.json();
+  async function loadWishesFromSupabase() {
+    if (!supabase) {
+      console.error('Supabase client not ready');
+      return;
+    }
 
-      if (data.success) {
-        renderWishes(data.wishes || []);
-      }
+    try {
+      const { data, error } = await supabase
+        .from('public_wishes')
+        .select('name, wish, created_at')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+      renderWishes(data || []);
     } catch (err) {
       console.error('Load wishes failed:', err);
     }
@@ -348,49 +366,83 @@ const giftCopyToast = document.getElementById('giftCopyToast');
   rsvpForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    if (!supabase) {
+      alert('ยังไม่สามารถเชื่อมต่อฐานข้อมูลได้');
+      return;
+    }
+
     const payload = {
       name: guestInput?.value.trim() || 'แขกผู้มีเกียรติ',
       attendance: attendanceSelect?.value || '',
-      pax: paxSelect?.value || '',
+      pax: paxSelect?.value ? Number(paxSelect.value) : null,
       wish: wishInput?.value.trim() || ''
     };
 
-    const formData = new URLSearchParams();
-    formData.append('name', payload.name);
-    formData.append('attendance', payload.attendance);
-    formData.append('pax', payload.pax);
-    formData.append('wish', payload.wish);
+    try {
+      const { error: rsvpError } = await supabase
+        .from('rsvp_submissions')
+        .insert({
+          name: payload.name,
+          attendance: payload.attendance,
+          pax: payload.pax,
+          wish: payload.wish
+        });
+
+      if (rsvpError) throw rsvpError;
+
+      if (payload.wish) {
+        const { error: wishError } = await supabase
+          .from('public_wishes')
+          .insert({
+            name: payload.name,
+            wish: payload.wish
+          });
+
+        if (wishError) throw wishError;
+      }
+
+      if (thankYouMessage) {
+        thankYouMessage.style.display = 'block';
+        setTimeout(() => {
+          thankYouMessage.style.display = 'none';
+        }, 2200);
+      }
+
+      rsvpForm.reset();
+
+      if (paxSelect) {
+        paxSelect.disabled = true;
+        paxSelect.value = '';
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.classList.remove('enabled');
+      }
+
+      await loadWishesFromSupabase();
+    } catch (error) {
+      console.error('Submit failed:', error);
+      alert('ส่งข้อมูลไม่สำเร็จ');
+    }
+  });
+
+  copyGiftAccountBtn?.addEventListener('click', async () => {
+    if (!PROMPTPAY_NUMBER || PROMPTPAY_NUMBER === '0835332099') {
+      alert('กรุณาตั้งค่าเลขพร้อมเพย์ในไฟล์ script.js ก่อน');
+      return;
+    }
 
     try {
-      const res = await fetch(SHEET_API_URL, {
-        method: 'POST',
-        body: formData
-      });
-
-      const result = await res.json();
-
-      if (result.success) {
-        if (thankYouMessage) {
-          thankYouMessage.style.display = 'block';
-          setTimeout(() => {
-            thankYouMessage.style.display = 'none';
-          }, 2200);
-        }
-
-        rsvpForm.reset();
-        if (paxSelect) paxSelect.disabled = true;
-        if (submitBtn) {
-          submitBtn.disabled = true;
-          submitBtn.classList.remove('enabled');
-        }
-
-        await loadWishesFromSheet();
-      } else {
-        alert('ส่งข้อมูลไม่สำเร็จ');
+      await navigator.clipboard.writeText(PROMPTPAY_NUMBER);
+      if (giftCopyToast) {
+        giftCopyToast.style.display = 'block';
+        setTimeout(() => {
+          giftCopyToast.style.display = 'none';
+        }, 1800);
       }
-    } catch (error) {
-      console.error(error);
-      alert('เชื่อมต่อ Google Sheet ไม่สำเร็จ');
+    } catch (_) {
+      alert('คัดลอกเลขบัญชีไม่สำเร็จ');
     }
   });
 
@@ -428,23 +480,5 @@ const giftCopyToast = document.getElementById('giftCopyToast');
   initNavObserver();
   initParallax();
   runInitialStaticReveal();
-  loadWishesFromSheet();
-});
-/* ---------------- WEDDING GIFT COPY ---------------- */
-
-copyGiftAccountBtn?.addEventListener('click', async () => {
-  const accountNumber = giftAccountNumber?.textContent?.trim();
-  if (!accountNumber) return;
-
-  try {
-    await navigator.clipboard.writeText(accountNumber);
-    if (giftCopyToast) {
-      giftCopyToast.style.display = 'block';
-      setTimeout(() => {
-        giftCopyToast.style.display = 'none';
-      }, 1800);
-    }
-  } catch (_) {
-    alert('คัดลอกเลขบัญชีไม่สำเร็จ');
-  }
+  loadWishesFromSupabase();
 });
